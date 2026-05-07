@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Jraot Regular';
+  src: url('./assets/fonts/Jraot-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jraot Hollow';
+  src: url('./assets/fonts/Jraot-Hollow.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-family-jraot: 'Jraot Regular', sans-serif;
+  --font-family-jraot-hollow: 'Jraot Hollow', sans-serif;
+  --color-primary: #16a34a;
+  --color-primary-light: #22c55e;
+  --color-primary-dark: #15803d;
+  --color-accent-orange: #f97316;
+  --color-accent-red: #ef4444;
+  --color-street-black: #0a0a0a;
+  --color-street-dark: #111111;
+  --color-street-gray: #1a1a1a;
+  --font-family-display: "Bebas Neue", Impact, sans-serif;
+  --font-family-mono: "Space Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #0a0a0a;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 3px; }
+
+.font-display {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.05em;
+}
+.font-mono { font-family: 'Space Mono', monospace; }
+
+.gradient-text {
+  background: linear-gradient(135deg, #16a34a 0%, #f97316 60%, #ef4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes brand-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.brand-slider { animation: brand-scroll 28s linear infinite; }
+.brand-slider:hover { animation-play-state: paused; }
+
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  z-index: 9999;
+}
