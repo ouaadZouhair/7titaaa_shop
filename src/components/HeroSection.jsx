@@ -16,7 +16,7 @@ export default function HeroSection() {
           <img
             src={leftImage}
             alt="Dark fashion"
-            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-[2s] ease-out group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[2s] ease-out group-hover:scale-105"
           />
           {/* dark dim */}
           <div className="absolute inset-0 bg-black/20" />
@@ -30,7 +30,7 @@ export default function HeroSection() {
             className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[2s] ease-out group-hover:scale-105"
           />
           {/* light dim */}
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
       </div>
 
@@ -43,37 +43,56 @@ export default function HeroSection() {
       {/* ── Centered text overlay ── */}
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6 gap-2">
 
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col items-center text-white uppercase leading-none tracking-tight select-none gap-2"
-          style={{ fontSize: 'clamp(2.5rem, 7.5vw, 6.5rem)' }}
         >
-          <span style={{ fontFamily: 'Jraot Regular, sans-serif' }}>OLD</span>
-          <span style={{ fontFamily: 'Jraot Regular, sans-serif' }}>BUT</span>
-          <span className='text-primary-light' style={{ fontFamily: 'Jraot Regular, sans-serif' }}>7TITAAA</span>
-        </motion.h1>
+          <img src={logo} alt="7titaaa" className="w-64 md:w-96 lg:w-[30rem] w-auto" />
+        </motion.div>
 
         {/* <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.7, ease: 'easeOut' }}
-          className="text-white/50 text-sm md:text-base font-normal mt-5 mb-8 tracking-wide"
+          className="text-white text-sm md:text-xl uppercase font-normal mt-5 mb-8 tracking-wide"
         >
-          Add a little bit of body text
+          Old but Gold
         </motion.p> */}
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.7, ease: 'easeOut' }}
+          className="mt-4"
         >
           <Link
             to="/shop"
-            className="inline-block bg-white text-black font-mono text-[11px] tracking-[0.4em] uppercase px-10 py-4 border border-white hover:bg-transparent hover:text-white transition-colors duration-200"
+            className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden"
           >
-            SHOP NOW
+            {/* animated background fill */}
+            <span className="absolute inset-0 border-2 border-white" />
+            <span className="absolute inset-0 bg-white translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+
+            <span className="relative font-mono text-xs sm:text-sm tracking-[0.35em] uppercase text-white group-hover:text-black transition-colors duration-300 font-bold">
+              Shop Now
+            </span>
+
+            {/* arrow */}
+            <span className="relative flex items-center overflow-hidden w-5 h-4">
+              <svg
+                className="absolute w-4 h-4 text-white group-hover:text-black transition-colors duration-300 translate-x-0 group-hover:translate-x-5 transition-transform duration-300 ease-in"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+              <svg
+                className="absolute w-4 h-4 text-black -translate-x-5 group-hover:translate-x-0 transition-transform duration-300 ease-out"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </span>
           </Link>
         </motion.div>
       </div>

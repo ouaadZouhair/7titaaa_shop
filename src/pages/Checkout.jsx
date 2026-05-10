@@ -5,24 +5,56 @@ import { useForm } from 'react-hook-form'
 import { useCart } from '../context/CartContext'
 import AnimatedButton from '../components/AnimatedButton'
 
+const WHATSAPP_NUMBER = '212704634570'
+
+const MOROCCO_CITIES = [
+  'Casablanca', 'Rabat', 'Marrakech', 'Fès', 'Tanger', 'Agadir', 'Meknès',
+  'Oujda', 'Kénitra', 'Tétouan', 'Salé', 'Mohammedia', 'Khouribga',
+  'Beni Mellal', 'El Jadida', 'Nador', 'Taza', 'Settat', 'Larache',
+  'Khémisset', 'Guelmim', 'Berrechid', 'Khénifra', 'Taourirt', 'Tiznit',
+  'Safi', 'Essaouira', 'Errachidia', 'Ouarzazate', 'Laâyoune',
+]
+
 export default function Checkout() {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount, clearCart } = useCart()
-  const [step, setStep] = useState('cart') // 'cart' | 'shipping' | 'payment' | 'confirmed'
+  const { cartItems, removeFromCart, cartTotal, cartCount, clearCart } = useCart()
+  const [step, setStep] = useState('cart') // 'cart' | 'shipping' | 'whatsapp' | 'confirmed'
   const [shippingData, setShippingData] = useState(null)
   const navigate = useNavigate()
 
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { register, handleSubmit } = useForm()
 
   const shipping = cartTotal >= 100 ? 0 : 9.99
-  const tax = cartTotal * 0.08
-  const total = cartTotal + shipping + tax
+  const total = cartTotal + shipping
 
   const handleShipping = (data) => {
     setShippingData(data)
-    setStep('payment')
+    setStep('whatsapp')
   }
 
-  const handleOrder = () => {
+  const handleSendWhatsApp = () => {
+    const itemLines = cartItems.map(item =>
+      `• ${item.name} — $${item.price.toFixed(2)}\n  🖼️ ${item.image}`
+    ).join('\n\n')
+
+    const message = [
+      '🛍️ NEW ORDER — 7titaaa',
+      '',
+      '👤 CLIENT:',
+      `${shippingData.firstName} ${shippingData.lastName}`,
+      `📞 ${shippingData.phone}`,
+      shippingData.email,
+      `📍 ${shippingData.address}, ${shippingData.city}`,
+      '',
+      '🛒 ITEMS:',
+      itemLines,
+      '',
+      `💰 Subtotal: $${cartTotal.toFixed(2)}`,
+      `🚚 Shipping: ${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}`,
+      `✅ TOTAL: $${total.toFixed(2)}`,
+    ].join('\n')
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+    window.open(url, '_blank')
     clearCart()
     setStep('confirmed')
   }
@@ -44,12 +76,12 @@ export default function Checkout() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="font-display text-5xl text-street-black tracking-wide mb-4">ORDER CONFIRMED</h2>
+          <h2 className="font-display text-5xl text-street-black tracking-wide mb-4">ORDER SENT</h2>
           <p className="text-gray-500 text-sm leading-relaxed mb-2">
-            Your order has been placed. You'll receive a confirmation email shortly.
+            Your order was sent via WhatsApp. We'll confirm it and get back to you shortly.
           </p>
           <p className="font-mono text-[10px] text-gray-400 tracking-widest uppercase mb-8">
-            Order #7T-{Math.floor(Math.random() * 90000 + 10000)}
+            Ref #7T-{Math.floor(Math.random() * 90000 + 10000)}
           </p>
           <AnimatedButton variant="dark" onClick={() => navigate('/shop')} className="mx-auto">
             Continue Shopping
@@ -67,10 +99,10 @@ export default function Checkout() {
           <h1 className="font-display text-5xl text-white tracking-wide">CHECKOUT</h1>
           {/* Step indicator */}
           <div className="flex items-center gap-3 mt-4">
-            {['Cart', 'Shipping', 'Payment'].map((s, i) => {
-              const stepKey = ['cart', 'shipping', 'payment'][i]
+            {['Cart', 'Shipping', 'WhatsApp'].map((s, i) => {
+              const stepKey = ['cart', 'shipping', 'whatsapp'][i]
               const isActive = step === stepKey
-              const isDone = ['cart', 'shipping', 'payment'].indexOf(step) > i
+              const isDone = ['cart', 'shipping', 'whatsapp'].indexOf(step) > i
               return (
                 <div key={s} className="flex items-center gap-3">
                   <span
@@ -138,7 +170,6 @@ export default function Checkout() {
                                 {item.category}
                               </p>
                               <h3 className="font-semibold text-sm text-street-black leading-tight">{item.name}</h3>
-                              <p className="font-mono text-xs text-gray-400 mt-1">Size: {item.size}</p>
                             </div>
                             <button
                               onClick={() => removeFromCart(item.id, item.size)}
@@ -150,24 +181,8 @@ export default function Checkout() {
                             </button>
                           </div>
                           <div className="flex items-center justify-between mt-3">
-                            <div className="inline-flex items-center border border-gray-200 rounded-sm">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
-                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-street-black transition-colors"
-                              >
-                                −
-                              </button>
-                              <span className="w-8 text-center font-mono text-xs">{item.quantity}</span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-street-black transition-colors"
-                              >
-                                +
-                              </button>
-                            </div>
-                            <span className="font-bold text-street-black">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </span>
+                            <span className="font-mono text-[10px] text-gray-400 tracking-widest uppercase">Qty: 1</span>
+                            <span className="font-bold text-street-black">${item.price.toFixed(2)}</span>
                           </div>
                         </div>
                       </motion.div>
@@ -210,12 +225,21 @@ export default function Checkout() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">First Name</label>
-                      <input {...register('firstName', { required: true })} placeholder="Jordan" className={inputClass} />
+                      <input {...register('firstName', { required: true })} placeholder="Yassine" className={inputClass} />
                     </div>
                     <div>
                       <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Last Name</label>
-                      <input {...register('lastName', { required: true })} placeholder="Williams" className={inputClass} />
+                      <input {...register('lastName', { required: true })} placeholder="Alami" className={inputClass} />
                     </div>
+                  </div>
+                  <div>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Phone</label>
+                    <input
+                      {...register('phone', { required: true })}
+                      type="tel"
+                      placeholder="+212 6XX XXX XXX"
+                      className={inputClass}
+                    />
                   </div>
                   <div>
                     <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Email</label>
@@ -223,39 +247,28 @@ export default function Checkout() {
                   </div>
                   <div>
                     <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Address</label>
-                    <input {...register('address', { required: true })} placeholder="123 Street Ave" className={inputClass} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">City</label>
-                      <input {...register('city', { required: true })} placeholder="New York" className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">ZIP Code</label>
-                      <input {...register('zip', { required: true })} placeholder="10001" className={inputClass} />
-                    </div>
+                    <input {...register('address', { required: true })} placeholder="123 Rue Mohammed V" className={inputClass} />
                   </div>
                   <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Country</label>
-                    <select {...register('country')} className={inputClass}>
-                      <option value="US">United States</option>
-                      <option value="UK">United Kingdom</option>
-                      <option value="FR">France</option>
-                      <option value="MA">Morocco</option>
-                      <option value="OTHER">Other</option>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">City</label>
+                    <select {...register('city', { required: true })} className={inputClass}>
+                      <option value="">— Select your city —</option>
+                      {MOROCCO_CITIES.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
                     </select>
                   </div>
                   <AnimatedButton type="submit" variant="dark" fullWidth className="py-4 mt-2">
-                    Continue to Payment →
+                    Review & Send via WhatsApp →
                   </AnimatedButton>
                 </form>
               </motion.div>
             )}
 
-            {/* PAYMENT STEP */}
-            {step === 'payment' && (
+            {/* WHATSAPP STEP */}
+            {step === 'whatsapp' && (
               <motion.div
-                key="payment"
+                key="whatsapp"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -267,43 +280,52 @@ export default function Checkout() {
                 >
                   ← Back to Shipping
                 </button>
-                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">PAYMENT</h2>
+                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">CONFIRM ORDER</h2>
 
-                <div className="bg-white rounded-sm p-6 space-y-5">
-                  <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-sm">
-                    <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <p className="font-mono text-[10px] tracking-widest text-primary uppercase">Secure Payment</p>
+                {/* Client info recap */}
+                {shippingData && (
+                  <div className="bg-white rounded-sm p-5 mb-4">
+                    <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">Shipping to</p>
+                    <p className="text-sm font-semibold text-street-black">{shippingData.firstName} {shippingData.lastName}</p>
+                    <p className="text-sm text-gray-500">{shippingData.phone}</p>
+                    <p className="text-sm text-gray-500">{shippingData.email}</p>
+                    <p className="text-sm text-gray-500">{shippingData.address}, {shippingData.city}</p>
                   </div>
+                )}
 
-                  <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Card Number</label>
-                    <input placeholder="•••• •••• •••• ••••" className={inputClass} maxLength={19} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Expiry</label>
-                      <input placeholder="MM / YY" className={inputClass} maxLength={7} />
+                {/* Items recap with images */}
+                <div className="bg-white rounded-sm p-5 mb-4 space-y-4">
+                  <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase">Items ({cartCount})</p>
+                  {cartItems.map(item => (
+                    <div key={`${item.id}-${item.size}`} className="flex gap-4 items-center">
+                      <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-sm flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-street-black leading-tight">{item.name}</p>
+                        <p className="font-mono text-[10px] text-gray-400 mt-1">Qty: 1</p>
+                      </div>
+                      <span className="text-sm font-bold text-street-black">${item.price.toFixed(2)}</span>
                     </div>
-                    <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">CVV</label>
-                      <input placeholder="•••" className={inputClass} maxLength={4} type="password" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Name on Card</label>
-                    <input placeholder="Jordan Williams" className={inputClass} />
-                  </div>
+                  ))}
+                </div>
+
+                {/* WhatsApp CTA */}
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-sm mb-5">
+                  <svg className="w-4 h-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.122 1.523 5.854L.057 23.886a.5.5 0 00.606.63l6.257-1.641A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.876 9.876 0 01-5.031-1.373l-.36-.214-3.733.979 1.003-3.628-.235-.374A9.86 9.86 0 012.1 12C2.1 6.533 6.533 2.1 12 2.1S21.9 6.533 21.9 12 17.467 21.9 12 21.9z"/>
+                  </svg>
+                  <p className="font-mono text-[10px] tracking-widest text-green-700 uppercase">
+                    Clicking below opens WhatsApp with your full order details
+                  </p>
                 </div>
 
                 <AnimatedButton
                   variant="gradient"
-                  onClick={handleOrder}
+                  onClick={handleSendWhatsApp}
                   fullWidth
-                  className="py-4 mt-6 text-base"
+                  className="py-4 text-base"
                 >
-                  Place Order — ${total.toFixed(2)}
+                  Send Order on WhatsApp — ${total.toFixed(2)}
                 </AnimatedButton>
               </motion.div>
             )}
@@ -322,19 +344,18 @@ export default function Checkout() {
                   <img src={item.image} alt={item.name} className="w-12 h-14 object-cover rounded-sm flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-street-black truncate">{item.name}</p>
-                    <p className="font-mono text-[10px] text-gray-400">× {item.quantity} · {item.size}</p>
+                    <p className="font-mono text-[10px] text-gray-400">× 1</p>
                   </div>
-                  <span className="text-sm font-semibold flex-shrink-0">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="text-sm font-semibold flex-shrink-0">${item.price.toFixed(2)}</span>
                 </div>
               ))}
             </div>
 
-            {/* Divider */}
+            {/* Totals */}
             <div className="border-t border-gray-100 pt-4 space-y-2">
               {[
                 { label: 'Subtotal', value: `$${cartTotal.toFixed(2)}` },
                 { label: 'Shipping', value: shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` },
-                { label: 'Tax (8%)', value: `$${tax.toFixed(2)}` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="text-gray-500">{label}</span>

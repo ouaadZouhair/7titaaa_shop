@@ -1,3 +1,9 @@
+import catHoodie  from '../assets/categorie/hoodie.jpg'
+import catJeans   from '../assets/categorie/jeans.jpg'
+import catTees    from '../assets/categorie/tees.jpg'
+import catJacket  from '../assets/categorie/jacket.jpg'
+import catCap  from '../assets/categorie/cap.jpg'
+
 export const products = [
   {
     id: 1,
@@ -255,35 +261,35 @@ export const categories = [
   {
     id: 1,
     name: "Hoodies",
-    image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&q=80&fit=crop",
+    image: catHoodie,
     count: 8,
     span: "col-span-2 row-span-2",
   },
   {
     id: 2,
-    name: "Sneakers",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80&fit=crop",
+    name: "Jeans",
+    image: catJeans,
     count: 6,
     span: "col-span-1 row-span-1",
   },
   {
     id: 3,
     name: "Caps",
-    image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&q=80&fit=crop",
+    image: catCap,
     count: 4,
     span: "col-span-1 row-span-1",
   },
   {
     id: 4,
     name: "Tees",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80&fit=crop",
+    image: catTees,
     count: 12,
     span: "col-span-1 row-span-1",
   },
   {
     id: 5,
     name: "Jackets",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80&fit=crop",
+    image: catJacket,
     count: 5,
     span: "col-span-1 row-span-1",
   },

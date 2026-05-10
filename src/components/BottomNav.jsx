@@ -60,7 +60,7 @@ export default function BottomNav() {
   const { cartCount } = useCart()
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-street-black border-t border-white/10">
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-street-black border-t border-white/10">
       <div className="flex items-stretch h-16">
         {tabs.map(({ to, label, exact, icon, isCart }) => (
           <NavLink

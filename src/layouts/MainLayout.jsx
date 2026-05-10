@@ -21,7 +21,7 @@ export default function MainLayout() {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="flex-1 pt-16 pb-16 md:pb-0"
+        className="flex-1 lg:pt-16 pb-16 lg:pb-0"
       >
         <Outlet />
       </motion.main>

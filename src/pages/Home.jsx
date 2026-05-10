@@ -42,7 +42,7 @@ export default function Home() {
       <BrandSlider />
 
       {/* ─── CATEGORIES GRID ─── */}
-      <section className="py-20 px-6 max-w-7xl mx-auto">
+      <section className="py-20 px-6 max-w-screen-2xl mx-auto">
         <Section className="mb-12 text-center">
           <p className="font-mono text-[11px] tracking-[0.5em] text-primary uppercase mb-3">Browse By</p>
           <h2 className="font-display text-5xl md:text-6xl text-street-black tracking-wide">
@@ -51,7 +51,7 @@ export default function Home() {
         </Section>
 
         {/* Asymmetrical grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-2 gap-3 h-auto md:h-[560px]">
+        <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-4 h-auto md:h-150">
           {/* Big card — Hoodies */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -60,7 +60,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="col-span-2 md:col-span-1 md:row-span-2"
           >
-            <CategoryCard category={categories[0]} className="h-64 md:h-full" />
+            <CategoryCard category={categories[0]} className="h-96 md:h-full" />
           </motion.div>
 
           {/* Small cards */}
@@ -72,7 +72,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: (i + 1) * 0.1, duration: 0.5 }}
             >
-              <CategoryCard category={cat} className="h-52 md:h-full" />
+              <CategoryCard category={cat} className="h-72 md:h-full" />
             </motion.div>
           ))}
         </div>
