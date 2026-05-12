@@ -2,6 +2,7 @@ import { motion, useInView } from 'motion/react'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import AnimatedButton from '../components/AnimatedButton'
+import vintageStore from '../assets/photos/vintage_store.jpg'
 
 function Reveal({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
@@ -41,14 +42,13 @@ export default function About() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative bg-street-black py-28 px-6 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background:
-              'radial-gradient(ellipse 70% 60% at 30% 40%, rgba(22,163,74,0.3) 0%, transparent 70%)',
-          }}
+      <section className="relative py-28 px-6 overflow-hidden">
+        <img
+          src={vintageStore}
+          alt="Vintage store"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
+        <div className="absolute inset-0 bg-black/60" />
         <div className="max-w-5xl mx-auto relative">
           <motion.p
             initial={{ opacity: 0, y: 10 }}

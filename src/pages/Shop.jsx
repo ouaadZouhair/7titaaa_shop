@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { products } from '../data/products'
+import vintageStore from '../assets/photos/clothes.jpg'
 import ProductCard from '../components/ProductCard'
 import SkeletonCard from '../components/SkeletonCard'
 
@@ -42,8 +43,17 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-white">
       {/* Page header */}
-      <div className="bg-street-black py-16 px-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="relative py-24 px-6 overflow-hidden">
+        {/* Background image */}
+        <img
+          src={vintageStore}
+          alt="Vintage store"
+          className="absolute inset-0 w-full h-full object-cover object-top"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative z-10 max-w-7xl mx-auto">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,9 +69,9 @@ export default function Shop() {
           >
             THE SHOP
           </motion.h1>
-          <p className="text-white/40 mt-2 font-light">
+          {/* <p className="text-white/40 mt-2 font-light">
             {filtered.length} {filtered.length === 1 ? 'item' : 'items'} found
-          </p>
+          </p> */}
         </div>
       </div>
 
