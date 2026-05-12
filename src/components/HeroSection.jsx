@@ -47,12 +47,12 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col items-center text-white uppercase leading-none tracking-tight select-none gap-2"
+          className="flex flex-col items-center text-white  leading-none tracking-tight select-none gap-2"
           style={{ fontSize: 'clamp(2.5rem, 7.5vw, 6.5rem)' }}
         >
-          <span style={{ fontFamily: 'Jraot Regular, sans-serif' }}>OLD</span>
-          <span style={{ fontFamily: 'Jraot Regular, sans-serif' }}>BUT</span>
-          <span className='text-primary-light' style={{ fontFamily: 'Jraot Regular, sans-serif' }}>7TITAAA</span>
+          <span className='uppercasse' style={{ fontFamily: 'Jraot Regular, sans-serif' }}>OLD</span>
+          <span className='uppercasse' style={{ fontFamily: 'Jraot Regular, sans-serif' }}>BUT Gold</span>
+          <span className='text-green-500 text-[170px]' style={{ fontFamily: 'SuperDash, sans-serif'}}>7Tita</span>
         </motion.h1>
 
         {/* <motion.p
@@ -71,7 +71,7 @@ export default function HeroSection() {
         >
           <Link
             to="/shop"
-            className="inline-block bg-white text-black font-mono text-[11px] tracking-[0.4em] uppercase px-10 py-4 border border-white hover:bg-transparent hover:text-white transition-colors duration-200"
+            className="inline-block bg-white text-black font-mono text-[16px] tracking-[0.4em] uppercase px-10 py-4 border border-white hover:bg-transparent hover:text-white transition-colors duration-200"
           >
             SHOP NOW
           </Link>
