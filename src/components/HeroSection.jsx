@@ -70,11 +70,9 @@ export default function HeroSection() {
         >
           <Link
             to="/shop"
-<<<<<<< HEAD
-            className="inline-block bg-white text-black font-mono text-[16px] tracking-[0.4em] uppercase px-10 py-4 border border-white hover:bg-transparent hover:text-white transition-colors duration-200"
-=======
+
             className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden"
->>>>>>> 6a5ded050e47d7b1a558a472dcbe738db615bb7d
+
           >
             {/* animated background fill */}
             <span className="absolute inset-0 border-2 border-white" />
