@@ -16,24 +16,12 @@ export default function Loader() {
         className="mb-10 text-center"
       >
         <img src={logo} alt="7titaaa" className="h-32 w-auto mx-auto" />
-        <p className="font-mono text-md text-primary-light tracking-[0.4em] mt-3 uppercase">
-          OLD BUT GOLD
-        </p>
       </motion.div>
 
-      {/* Progress bar */}
-      <div className="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg,#16a34a,#f97316,#ef4444)' }}
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 2, ease: 'easeInOut' }}
-        />
-      </div>
+  
 
       {/* Dots */}
-      <div className="flex gap-2 mt-8">
+      <div className="flex gap-2">
         {[0, 1, 2].map(i => (
           <motion.span
             key={i}

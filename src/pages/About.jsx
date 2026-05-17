@@ -78,39 +78,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Story section */}
-      <section className="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <Reveal>
-          <div className="rounded-sm overflow-hidden aspect-[4/5]">
-            <img
-              src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80&fit=crop"
-              alt="Street culture"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <p className="font-mono text-[11px] tracking-[0.4em] text-primary uppercase mb-4">Our Origin</p>
-          <h2 className="font-display text-5xl text-street-black tracking-wide mb-6">
-            FROM THE
-            <br />
-            BLOCK UP
-          </h2>
-          <div className="space-y-4 text-gray-500 leading-relaxed">
-            <p>
-              7titaaa started in a small apartment with a sewing machine, a vision, and a deep respect for hip-hop culture. The name itself is a nod to the raw energy of the streets — the number 7 representing perfection, and "titaaa" the raw creative spirit of our founders.
-            </p>
-            <p>
-              Every collection is a chapter in that story. We don't follow trends — we document culture. Our designers live the lifestyle, collaborate with artists, and source only from suppliers who share our standards.
-            </p>
-            <p>
-              Today, 7titaaa pieces are worn by creatives, athletes, and culture-shapers across the globe. But the mission stays the same: make gear worthy of the movement.
-            </p>
-          </div>
-        </Reveal>
-      </section>
-
       {/* Values */}
       <section className="py-20 bg-gray-50 px-6">
         <div className="max-w-7xl mx-auto">
@@ -141,7 +108,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { n: '2019', label: 'Founded' },
+              { n: '2023', label: 'Founded' },
               { n: '10K+', label: 'Customers' },
               { n: '200+', label: 'Pieces' },
               { n: '15+', label: 'Countries' },
