@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
-import { products } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 import vintageStore from '../assets/photos/clothes.jpg'
 import ProductCard from '../components/ProductCard'
 import SkeletonCard from '../components/SkeletonCard'
@@ -29,16 +29,20 @@ export default function Shop() {
     else setSearchParams({})
   }
 
+  const { items, loading } = useProducts({
+    category: activeCategory !== 'All' ? activeCategory : undefined,
+    limit: 100,
+  })
+
   const filtered = useMemo(() => {
-    let list = [...products]
-    if (activeCategory !== 'All') list = list.filter(p => p.category === activeCategory)
+    let list = [...items]
     list = list.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1])
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price)
     else if (sort === 'price-desc') list.sort((a, b) => b.price - a.price)
     else if (sort === 'rating') list.sort((a, b) => b.rating - a.rating)
     else list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
     return list
-  }, [activeCategory, sort, priceRange])
+  }, [items, sort, priceRange])
 
   return (
     <div className="min-h-screen bg-white">
@@ -160,32 +164,36 @@ export default function Shop() {
           layout
           className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         >
-          <AnimatePresence mode="popLayout">
-            {filtered.length === 0 ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="col-span-full py-20 text-center"
-              >
-                <p className="font-display text-4xl text-gray-200 mb-3">NO ITEMS FOUND</p>
-                <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
-              </motion.div>
-            ) : (
-              filtered.map((product, i) => (
+          {loading ? (
+            Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {filtered.length === 0 ? (
                 <motion.div
-                  key={product.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.05, duration: 0.4 }}
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="col-span-full py-20 text-center"
                 >
-                  <ProductCard product={product} />
+                  <p className="font-display text-4xl text-gray-200 mb-3">NO ITEMS FOUND</p>
+                  <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
                 </motion.div>
-              ))
-            )}
-          </AnimatePresence>
+              ) : (
+                filtered.map((product, i) => (
+                  <motion.div
+                    key={product.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: i * 0.05, duration: 0.4 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          )}
         </motion.div>
       </div>
     </div>

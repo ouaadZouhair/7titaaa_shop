@@ -1,8 +1,28 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(if \\(-not $?\\) { \"Directory is empty or new\" })",
-      "Bash(npm install *)"
+      "Bash(dir)",
+      "Bash(dir serveur-side *)",
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(dir client-side *)",
+      "Bash(node -e \"import\\('./server.js'\\).then\\(\\(\\) => setTimeout\\(\\(\\) => process.exit\\(0\\), 3000\\)\\).catch\\(e => { console.error\\(e\\); process.exit\\(1\\) }\\)\")",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/register -H \"Content-Type: application/json\" -d \"{\\\\\"name\\\\\":\\\\\"Test User\\\\\",\\\\\"email\\\\\":\\\\\"test@7titaaa.com\\\\\",\\\\\"password\\\\\":\\\\\"secret123\\\\\"}\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/register -H \"Content-Type: application/json\" -d \"{\\\\\"name\\\\\":\\\\\"Role Tester\\\\\",\\\\\"email\\\\\":\\\\\"role-test@7titaaa.com\\\\\",\\\\\"password\\\\\":\\\\\"secret123\\\\\"}\")",
+      "Bash(cd ../client-side && npm install lucide-react)",
+      "Read(//c/Users/HP/Desktop/7tita/**)",
+      "Bash(curl -s \"http://localhost:5000/api/products?limit=3\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5000/api/products/stats)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:5000/api/products -H \"Content-Type: application/json\" -d \"{\\\\\"name\\\\\":\\\\\"x\\\\\"}\")",
+      "Bash(npx eslint *)",
+      "Bash(npx vite *)",
+      "Bash(node -e \"import\\('./config/db.js'\\).then\\(async \\({ pool }\\) => { const [rows] = await pool.query\\('SELECT id, email, role FROM users ORDER BY id'\\); console.log\\(rows\\); process.exit\\(0\\); }\\)\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\\\\\"email\\\\\":\\\\\"role-test@7titaaa.com\\\\\",\\\\\"password\\\\\":\\\\\"secret123\\\\\"}')",
+      "Bash(curl -s -X PUT http://localhost:5000/api/auth/password -H \"Authorization: Bearer $\\(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\\\\\"email\\\\\":\\\\\"role-test@7titaaa.com\\\\\",\\\\\"password\\\\\":\\\\\"secret123\\\\\"}')",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"role-test@7titaaa.com\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:5000/api/uploads)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5000/uploads/nonexistent.jpg)"
     ]
   }
 }

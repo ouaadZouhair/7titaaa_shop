@@ -1,8 +1,10 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'motion/react'
-import { products, categories } from '../data/products'
+import { categories } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 import ProductCard from '../components/ProductCard'
+import SkeletonCard from '../components/SkeletonCard'
 import CategoryCard from '../components/CategoryCard'
 import BrandSlider from '../components/BrandSlider'
 import AnimatedButton from '../components/AnimatedButton'
@@ -32,7 +34,7 @@ function Section({ children, className = '' }) {
 }
 
 export default function Home() {
-  const newDrops = products.slice(0, 8)
+  const { items: newDrops, loading } = useProducts({ limit: 8 })
 
   return (
     <div>
@@ -156,17 +158,19 @@ export default function Home() {
         </Section>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {newDrops.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ delay: i * 0.07, duration: 0.5 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+            : newDrops.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ delay: i * 0.07, duration: 0.5 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
         </div>
       </section>
 

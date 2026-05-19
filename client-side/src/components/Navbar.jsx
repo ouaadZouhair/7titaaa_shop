@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const { cartCount } = useCart()
+  const { user, logout } = useAuth()
   const { t, i18n } = useTranslation()
 
   const isEN = i18n.language === 'en'
@@ -78,6 +80,28 @@ export default function Navbar() {
               FR
             </span>
           </button>
+
+          {/* Account */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-[10px] tracking-widest uppercase text-white/70">
+                {user.name}
+              </span>
+              <button
+                onClick={logout}
+                className="font-mono text-[10px] tracking-widest uppercase text-white/40 hover:text-accent-red transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="font-mono text-[10px] tracking-widest uppercase text-white/60 hover:text-white transition-colors"
+            >
+              Login
+            </Link>
+          )}
 
           {/* Cart */}
           <Link

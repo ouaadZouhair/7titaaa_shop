@@ -9,6 +9,14 @@ import ProductDetails from './pages/ProductDetails'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Checkout from './pages/Checkout'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import AdminLayout from './layouts/AdminLayout'
+import Overview from './pages/admin/Overview'
+import AdminProducts from './pages/admin/Products'
+import Analytics from './pages/admin/Analytics'
+import Settings from './pages/admin/Settings'
+import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   const [loading, setLoading] = useState(true)
@@ -35,6 +43,22 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Overview />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </AnimatePresence>

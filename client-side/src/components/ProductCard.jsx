@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useCart } from '../context/CartContext'
 import { useTranslation } from 'react-i18next'
+import { resolveImageUrl } from '../lib/uploads'
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart()
@@ -11,16 +12,18 @@ export default function ProductCard({ product }) {
   const [hovered, setHovered] = useState(false)
   const [added, setAdded] = useState(false)
 
+  const defaultSize = product.size || product.sizes?.[0] || 'M'
+
   const handleAdd = (e) => {
     e.preventDefault()
-    addToCart(product, product.sizes[2] || product.sizes[0])
+    addToCart(product, defaultSize)
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)
   }
 
   const handleBuyNow = (e) => {
     e.preventDefault()
-    addToCart(product, product.sizes[2] || product.sizes[0])
+    addToCart(product, defaultSize)
     navigate('/checkout')
   }
 
@@ -39,7 +42,7 @@ export default function ProductCard({ product }) {
         {/* ── Image ── */}
         <div className="relative overflow-hidden aspect-[3/4]">
           <motion.img
-            src={product.image}
+            src={resolveImageUrl(product.image)}
             alt={product.name}
             className="w-full h-full object-cover"
             animate={{ scale: hovered ? 1.06 : 1 }}
