@@ -160,16 +160,25 @@ export default function ProductDetails() {
           {/* Quality */}
           <div className="flex items-center gap-2 mb-6">
             <span className="font-mono text-[10px] tracking-widest uppercase text-gray-400">Quality</span>
-            <span className="font-mono text-[10px] tracking-widest uppercase text-primary font-bold">
-              — 10/10
-            </span>
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <svg
+                  key={star}
+                  className={`w-4 h-4 ${star <= (product.quality ?? 5) ? 'text-amber-400' : 'text-gray-200'}`}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              ))}
+            </div>
           </div>
 
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="font-display text-4xl text-street-black">${product.price}</span>
+            <span className="font-display text-4xl text-street-black">{product.price} DH</span>
             {product.originalPrice && (
-              <span className="text-gray-400 text-lg line-through">${product.originalPrice}</span>
+              <span className="text-gray-400 text-lg line-through">{product.originalPrice} DH</span>
             )}
           </div>
 

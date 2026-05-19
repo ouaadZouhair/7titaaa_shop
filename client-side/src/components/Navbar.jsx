@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+
+const CATEGORIES = ['Hoodies', 'Sneakers', 'Caps', 'Tees', 'Jackets', 'Bottoms']
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const inputRef = useRef(null)
   const { cartCount } = useCart()
-  const { user, logout } = useAuth()
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
 
   const isEN = i18n.language === 'en'
 
@@ -24,10 +28,32 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  useEffect(() => {
+    if (searchOpen) inputRef.current?.focus()
+  }, [searchOpen])
+
+  const closeSearch = () => {
+    setSearchOpen(false)
+    setQuery('')
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') { closeSearch(); return }
+    if (e.key !== 'Enter') return
+    const term = query.trim()
+    if (!term) return
+    closeSearch()
+    const matched = CATEGORIES.find(c => c.toLowerCase() === term.toLowerCase())
+    if (matched) {
+      navigate(`/shop?category=${encodeURIComponent(matched)}`)
+    } else {
+      navigate(`/shop?search=${encodeURIComponent(term)}`)
+    }
+  }
+
   const links = [
     { to: '/', label: t('nav.home'), exact: true },
     { to: '/shop', label: t('nav.shop') },
-    { to: '/about', label: t('nav.about') },
     { to: '/contact', label: t('nav.contact') },
   ]
 
@@ -59,7 +85,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* RIGHT — Language toggle + Cart */}
+        {/* RIGHT */}
         <div className="flex items-center gap-5">
 
           {/* Language toggle pill */}
@@ -81,27 +107,40 @@ export default function Navbar() {
             </span>
           </button>
 
-          {/* Account */}
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-[10px] tracking-widest uppercase text-white/70">
-                {user.name}
-              </span>
-              <button
-                onClick={logout}
-                className="font-mono text-[10px] tracking-widest uppercase text-white/40 hover:text-accent-red transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="font-mono text-[10px] tracking-widest uppercase text-white/60 hover:text-white transition-colors"
+          {/* Search */}
+          <div className="flex items-center gap-2">
+            {searchOpen && (
+              <>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search products, tags..."
+                  className="w-52 bg-white/10 text-white placeholder-white/30 font-mono text-[11px] tracking-wider px-3 py-1.5 rounded-sm border border-white/20 outline-none focus:border-white/50 transition-all"
+                />
+                <button
+                  onClick={closeSearch}
+                  aria-label="Close search"
+                  className="text-white/40 hover:text-white transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => setSearchOpen(o => !o)}
+              aria-label="Search"
+              className="text-white/60 hover:text-white transition-colors"
             >
-              Login
-            </Link>
-          )}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
+            </button>
+          </div>
 
           {/* Cart */}
           <Link

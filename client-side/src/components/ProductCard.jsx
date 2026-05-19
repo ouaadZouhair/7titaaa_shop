@@ -112,11 +112,11 @@ export default function ProductCard({ product }) {
           </h3>
           <div className="flex flex-col items-end shrink-0">
             <span className="font-bold text-[13px] text-neutral-900 leading-tight">
-              ${product.price}
+              {product.price} DH
             </span>
             {product.originalPrice && (
               <span className="font-mono text-xs text-neutral-400 line-through leading-tight">
-                ${product.originalPrice}
+                {product.originalPrice} DH
               </span>
             )}
           </div>

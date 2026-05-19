@@ -185,16 +185,16 @@ export default function Home() {
         />
         <Section className="relative z-10">
           <h2 className="font-display text-5xl md:text-7xl tracking-wider mb-4">
-            JOIN THE MOVEMENT
+            JOIN THE CULTURE
           </h2>
           <p className="font-mono text-[11px] tracking-[0.4em] opacity-70 uppercase mb-8">
-            Free shipping on orders over $100
+            Follow us on Instagram
           </p>
-          <Link to="/shop">
+          <a href="https://www.instagram.com/7titaaa" target="_blank" rel="noopener noreferrer">
             <AnimatedButton variant="dark" className="mx-auto text-sm px-10 py-4">
-              Shop The Collection
+              Follow on Instagram
             </AnimatedButton>
-          </Link>
+          </a>
         </Section>
       </section>
     </div>

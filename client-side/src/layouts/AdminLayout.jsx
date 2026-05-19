@@ -3,20 +3,19 @@ import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   Package,
-  BarChart3,
   Settings,
   LogOut,
   Menu,
   X,
-  Search,
-  Bell,
+  ShoppingBag,
 } from 'lucide-react'
+import logo from '../assets/7titaaa_logo2.png'
 import { useAuth } from '../context/AuthContext'
 
 const navItems = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/admin/products', label: 'Products', icon: Package },
-  { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 
@@ -45,13 +44,13 @@ export default function AdminLayout() {
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-black text-white transform transition-transform duration-300
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
-        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
-          <Link to="/admin" className="font-display text-xl tracking-wider">
-            7TITAAA<span className="text-primary-light">.</span>
+        <div className="h-20 flex items-center justify-center px-6 border-b border-white/10 relative">
+          <Link to="/admin">
+            <img src={logo} alt="7titaaa" className="h-14 w-auto" />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white/60 hover:text-white"
+            className="lg:hidden text-white/60 hover:text-white absolute right-4"
           >
             <X size={20} />
           </button>
@@ -115,22 +114,12 @@ export default function AdminLayout() {
               >
                 <Menu size={20} />
               </button>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-100 w-72">
-                <Search size={16} className="text-gray-400" />
-                <input
-                  placeholder="Quick search…"
-                  className="bg-transparent text-sm outline-none w-full"
-                />
-              </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-md hover:bg-gray-100 text-gray-500">
-                <Bell size={18} />
-              </button>
-              <Link
+<Link
                 to="/"
-                className="font-mono text-[10px] tracking-widest uppercase text-gray-500 hover:text-black px-3"
+                className="font-mono text-[10px] tracking-widest uppercase px-4 py-2 rounded-md bg-black text-white hover:bg-gray-800 transition-colors"
               >
                 View site
               </Link>

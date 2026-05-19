@@ -17,12 +17,17 @@ export const ensureProductsTable = async () => {
       rating DECIMAL(2,1) NOT NULL DEFAULT 0,
       reviews INT NOT NULL DEFAULT 0,
       tags JSON NULL,
+      quality TINYINT(1) NOT NULL DEFAULT 5,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_category (category),
       INDEX idx_featured (is_featured),
       INDEX idx_new (is_new)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
+  // add quality column to existing tables that pre-date this field
+  await pool.query(`
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS quality TINYINT(1) NOT NULL DEFAULT 5
+  `).catch(() => {});
 };
 
 const rowToProduct = (row) => {
@@ -47,6 +52,7 @@ const rowToProduct = (row) => {
     rating: Number(row.rating),
     reviews: row.reviews,
     tags: parse(row.tags),
+    quality: row.quality != null ? Number(row.quality) : 5,
     created_at: row.created_at,
   };
 };
@@ -55,8 +61,8 @@ export const listProducts = async ({ search, category, limit = 100, offset = 0 }
   const where = [];
   const params = [];
   if (search) {
-    where.push("(name LIKE ? OR description LIKE ?)");
-    params.push(`%${search}%`, `%${search}%`);
+    where.push("(name LIKE ? OR description LIKE ? OR tags LIKE ?)");
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
   if (category && category !== "all") {
     where.push("category = ?");
@@ -97,16 +103,17 @@ const toRow = (p) => ({
   rating: p.rating ?? 0,
   reviews: p.reviews ?? 0,
   tags: JSON.stringify(p.tags || []),
+  quality: Math.min(5, Math.max(1, Number(p.quality) || 5)),
 });
 
 export const createProduct = async (p) => {
   const row = toRow(p);
   const [result] = await pool.query(
-    `INSERT INTO products (name, price, original_price, category, image, images, description, size, is_new, is_featured, rating, reviews, tags)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO products (name, price, original_price, category, image, images, description, size, is_new, is_featured, rating, reviews, tags, quality)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       row.name, row.price, row.original_price, row.category, row.image, row.images,
-      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags,
+      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality,
     ]
   );
   return getProductById(result.insertId);
@@ -115,11 +122,11 @@ export const createProduct = async (p) => {
 export const updateProduct = async (id, p) => {
   const row = toRow(p);
   await pool.query(
-    `UPDATE products SET name=?, price=?, original_price=?, category=?, image=?, images=?, description=?, size=?, is_new=?, is_featured=?, rating=?, reviews=?, tags=?
+    `UPDATE products SET name=?, price=?, original_price=?, category=?, image=?, images=?, description=?, size=?, is_new=?, is_featured=?, rating=?, reviews=?, tags=?, quality=?
      WHERE id=?`,
     [
       row.name, row.price, row.original_price, row.category, row.image, row.images,
-      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags,
+      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality,
       id,
     ]
   );
@@ -153,66 +160,4 @@ export const listCategories = async () => {
     "SELECT category, COUNT(*) AS count FROM products GROUP BY category ORDER BY count DESC"
   );
   return rows;
-};
-
-export const seedIfEmpty = async () => {
-  const [rows] = await pool.query("SELECT COUNT(*) AS c FROM products");
-  if (rows[0].c > 0) return;
-  const samples = [
-    {
-      name: "7titaaa OG Hoodie",
-      price: 89.99,
-      originalPrice: 120.0,
-      category: "Hoodies",
-      image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&q=80&fit=crop",
-        "https://images.unsplash.com/photo-1614093302611-8efc63da6193?w=800&q=80&fit=crop",
-        "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80&fit=crop",
-      ],
-      description:
-        "The signature 7titaaa hoodie. Heavyweight 400gsm fleece, dropped shoulders, and our iconic logo embroidered on the chest. Built for the streets, made to last.",
-      size: "M",
-      isNew: true,
-      isFeatured: true,
-      rating: 4.8,
-      reviews: 124,
-      tags: ["streetwear", "hoodie", "premium", "bestseller"],
-    },
-    {
-      name: "Air Street Runner",
-      price: 149.99,
-      originalPrice: 180.0,
-      category: "Sneakers",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80&fit=crop",
-      images: [
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80&fit=crop",
-        "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&q=80&fit=crop",
-      ],
-      description: "Engineered for the urban athlete. Breathable mesh upper, responsive foam sole.",
-      size: "42",
-      isNew: true,
-      isFeatured: true,
-      rating: 4.9,
-      reviews: 256,
-      tags: ["sneakers", "shoes", "running"],
-    },
-    {
-      name: "Fitted Snapback Cap",
-      price: 34.99,
-      originalPrice: null,
-      category: "Caps",
-      image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=80&fit=crop",
-      images: ["https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&q=80&fit=crop"],
-      description: "Crown-fitted snapback with embroidered 7titaaa logo.",
-      size: "OS",
-      isNew: false,
-      isFeatured: false,
-      rating: 4.5,
-      reviews: 78,
-      tags: ["cap", "headwear", "accessory"],
-    },
-  ];
-  for (const p of samples) await createProduct(p);
-  console.log(`Seeded ${samples.length} products`);
 };

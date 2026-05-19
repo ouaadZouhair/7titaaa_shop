@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useForm } from 'react-hook-form'
 import { useCart } from '../context/CartContext'
 import AnimatedButton from '../components/AnimatedButton'
+import api from '../lib/api'
 
 const WHATSAPP_NUMBER = '212704634570'
 
@@ -19,11 +20,13 @@ export default function Checkout() {
   const { cartItems, removeFromCart, cartTotal, cartCount, clearCart } = useCart()
   const [step, setStep] = useState('cart') // 'cart' | 'shipping' | 'whatsapp' | 'confirmed'
   const [shippingData, setShippingData] = useState(null)
+  const [orderRef, setOrderRef] = useState('')
+  const [sending, setSending] = useState(false)
   const navigate = useNavigate()
 
   const { register, handleSubmit } = useForm()
 
-  const shipping = cartTotal >= 100 ? 0 : 9.99
+  const shipping = 35
   const total = cartTotal + shipping
 
   const handleShipping = (data) => {
@@ -31,9 +34,36 @@ export default function Checkout() {
     setStep('whatsapp')
   }
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
+    setSending(true)
+    try {
+      const { data } = await api.post('/orders', {
+        firstName: shippingData.firstName,
+        lastName: shippingData.lastName,
+        phone: shippingData.phone,
+        email: shippingData.email,
+        address: shippingData.address,
+        city: shippingData.city,
+        subtotal: cartTotal,
+        shipping,
+        total,
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          category: item.category,
+          size: item.size,
+        })),
+      })
+      setOrderRef(data.order.ref)
+    } catch {
+      // order save failed — still proceed with WhatsApp
+      setOrderRef(`7T-${Math.floor(Math.random() * 90000 + 10000)}`)
+    }
+
     const itemLines = cartItems.map(item =>
-      `• ${item.name} — $${item.price.toFixed(2)}\n  🖼️ ${item.image}`
+      `• ${item.name} (${item.size}) — {item.price.toFixed(2)} DH DH\n  🖼️ ${item.image}`
     ).join('\n\n')
 
     const message = [
@@ -48,14 +78,15 @@ export default function Checkout() {
       '🛒 ITEMS:',
       itemLines,
       '',
-      `💰 Subtotal: $${cartTotal.toFixed(2)}`,
-      `🚚 Shipping: ${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}`,
-      `✅ TOTAL: $${total.toFixed(2)}`,
+      `💰 Subtotal: ${cartTotal.toFixed(2)} DH`,
+      `🚚 Shipping: ${shipping.toFixed(2)} DH`,
+      `✅ TOTAL: ${total.toFixed(2)} DH`,
     ].join('\n')
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
     clearCart()
+    setSending(false)
     setStep('confirmed')
   }
 
@@ -81,7 +112,7 @@ export default function Checkout() {
             Your order was sent via WhatsApp. We'll confirm it and get back to you shortly.
           </p>
           <p className="font-mono text-[10px] text-gray-400 tracking-widest uppercase mb-8">
-            Ref #7T-{Math.floor(Math.random() * 90000 + 10000)}
+            Ref #{orderRef}
           </p>
           <AnimatedButton variant="dark" onClick={() => navigate('/shop')} className="mx-auto">
             Continue Shopping
@@ -97,7 +128,6 @@ export default function Checkout() {
       <div className="bg-street-black py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="font-display text-5xl text-white tracking-wide">CHECKOUT</h1>
-          {/* Step indicator */}
           <div className="flex items-center gap-3 mt-4">
             {['Cart', 'Shipping', 'WhatsApp'].map((s, i) => {
               const stepKey = ['cart', 'shipping', 'whatsapp'][i]
@@ -105,11 +135,9 @@ export default function Checkout() {
               const isDone = ['cart', 'shipping', 'whatsapp'].indexOf(step) > i
               return (
                 <div key={s} className="flex items-center gap-3">
-                  <span
-                    className={`font-mono text-[10px] tracking-widest uppercase ${
-                      isActive ? 'text-primary-light' : isDone ? 'text-white/40 line-through' : 'text-white/20'
-                    }`}
-                  >
+                  <span className={`font-mono text-[10px] tracking-widest uppercase ${
+                    isActive ? 'text-primary-light' : isDone ? 'text-white/40 line-through' : 'text-white/20'
+                  }`}>
                     {s}
                   </span>
                   {i < 2 && <span className="text-white/20">→</span>}
@@ -121,7 +149,7 @@ export default function Checkout() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* ─── LEFT PANEL ─── */}
+        {/* LEFT PANEL */}
         <div className="lg:col-span-2">
           <AnimatePresence mode="wait">
 
@@ -170,6 +198,7 @@ export default function Checkout() {
                                 {item.category}
                               </p>
                               <h3 className="font-semibold text-sm text-street-black leading-tight">{item.name}</h3>
+                              <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">Size: {item.size}</p>
                             </div>
                             <button
                               onClick={() => removeFromCart(item.id, item.size)}
@@ -180,9 +209,8 @@ export default function Checkout() {
                               </svg>
                             </button>
                           </div>
-                          <div className="flex items-center justify-between mt-3">
-                            <span className="font-mono text-[10px] text-gray-400 tracking-widest uppercase">Qty: 1</span>
-                            <span className="font-bold text-street-black">${item.price.toFixed(2)}</span>
+                          <div className="flex items-center justify-end mt-3">
+                            <span className="font-bold text-street-black">{item.price.toFixed(2)} DH</span>
                           </div>
                         </div>
                       </motion.div>
@@ -282,7 +310,6 @@ export default function Checkout() {
                 </button>
                 <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">CONFIRM ORDER</h2>
 
-                {/* Client info recap */}
                 {shippingData && (
                   <div className="bg-white rounded-sm p-5 mb-4">
                     <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">Shipping to</p>
@@ -293,7 +320,6 @@ export default function Checkout() {
                   </div>
                 )}
 
-                {/* Items recap with images */}
                 <div className="bg-white rounded-sm p-5 mb-4 space-y-4">
                   <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase">Items ({cartCount})</p>
                   {cartItems.map(item => (
@@ -301,14 +327,13 @@ export default function Checkout() {
                       <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-sm flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-street-black leading-tight">{item.name}</p>
-                        <p className="font-mono text-[10px] text-gray-400 mt-1">Qty: 1</p>
+                        <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">Size: {item.size}</p>
                       </div>
-                      <span className="text-sm font-bold text-street-black">${item.price.toFixed(2)}</span>
+                      <span className="text-sm font-bold text-street-black">{item.price.toFixed(2)} DH</span>
                     </div>
                   ))}
                 </div>
 
-                {/* WhatsApp CTA */}
                 <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-sm mb-5">
                   <svg className="w-4 h-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -324,38 +349,37 @@ export default function Checkout() {
                   onClick={handleSendWhatsApp}
                   fullWidth
                   className="py-4 text-base"
+                  disabled={sending}
                 >
-                  Send Order on WhatsApp — ${total.toFixed(2)}
+                  {sending ? 'Saving…' : `Send Order on WhatsApp — ${total.toFixed(2)} DH`}
                 </AnimatedButton>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* ─── ORDER SUMMARY ─── */}
+        {/* ORDER SUMMARY */}
         <div>
           <div className="bg-white rounded-sm p-6 sticky top-24">
             <h3 className="font-display text-2xl text-street-black tracking-wide mb-5">ORDER SUMMARY</h3>
 
-            {/* Items */}
             <div className="space-y-3 mb-5">
               {cartItems.map(item => (
                 <div key={`${item.id}-${item.size}`} className="flex gap-3 items-center">
                   <img src={item.image} alt={item.name} className="w-12 h-14 object-cover rounded-sm flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-street-black truncate">{item.name}</p>
-                    <p className="font-mono text-[10px] text-gray-400">× 1</p>
+                    <p className="font-mono text-[10px] text-gray-400 uppercase">{item.size}</p>
                   </div>
-                  <span className="text-sm font-semibold flex-shrink-0">${item.price.toFixed(2)}</span>
+                  <span className="text-sm font-semibold flex-shrink-0">{item.price.toFixed(2)} DH</span>
                 </div>
               ))}
             </div>
 
-            {/* Totals */}
             <div className="border-t border-gray-100 pt-4 space-y-2">
               {[
-                { label: 'Subtotal', value: `$${cartTotal.toFixed(2)}` },
-                { label: 'Shipping', value: shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` },
+                { label: 'Subtotal', value: `${cartTotal.toFixed(2)} DH` },
+                { label: 'Shipping', value: `${shipping.toFixed(2)} DH` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="text-gray-500">{label}</span>
@@ -366,20 +390,10 @@ export default function Checkout() {
               ))}
               <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
                 <span className="font-semibold text-street-black">Total</span>
-                <span className="font-display text-2xl text-street-black">${total.toFixed(2)}</span>
+                <span className="font-display text-2xl text-street-black">{total.toFixed(2)} DH</span>
               </div>
             </div>
 
-            {shipping === 0 && (
-              <p className="font-mono text-[10px] text-primary tracking-widest uppercase mt-3 text-center">
-                ✓ Free shipping applied
-              </p>
-            )}
-            {shipping > 0 && (
-              <p className="font-mono text-[10px] text-gray-400 tracking-widest mt-3 text-center">
-                Add ${(100 - cartTotal).toFixed(2)} more for free shipping
-              </p>
-            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import logo from '../assets/7titaaa_logo2.png'
+import avatar from '../assets/profiel/ZouhairOD_profiel.png'
 
 export default function Loader() {
   return (
@@ -31,6 +32,35 @@ export default function Loader() {
           />
         ))}
       </div>
+
+      {/* Portfolio credit card */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.2 }}
+        className="absolute bottom-6 left-0 right-0 flex justify-center"
+      >
+        <a
+          href="https://zouhairod.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-4 px-6 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-all duration-200 group"
+        >
+          <img
+            src={avatar}
+            alt="ZouhairOD"
+            className="w-10 h-10 rounded-full object-cover shrink-0 border border-white/20 group-hover:scale-105 transition-transform"
+          />
+          <div className="text-left">
+            <p className="font-mono text-[9px] tracking-widest uppercase text-white/50 leading-none mb-0.5">
+              Created by
+            </p>
+            <p className="font-mono text-[11px] tracking-wider text-white font-medium leading-none">
+              ZouhairOD
+            </p>
+          </div>
+        </a>
+      </motion.div>
     </motion.div>
   )
 }

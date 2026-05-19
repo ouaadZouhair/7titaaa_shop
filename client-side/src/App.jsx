@@ -14,7 +14,7 @@ import Register from './pages/Register'
 import AdminLayout from './layouts/AdminLayout'
 import Overview from './pages/admin/Overview'
 import AdminProducts from './pages/admin/Products'
-import Analytics from './pages/admin/Analytics'
+import AdminOrders from './pages/admin/Orders'
 import Settings from './pages/admin/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -23,7 +23,7 @@ export default function App() {
   const location = useLocation()
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 2400)
+    const t = setTimeout(() => setLoading(false), 4500)
     return () => clearTimeout(t)
   }, [])
 
@@ -57,7 +57,7 @@ export default function App() {
         >
           <Route index element={<Overview />} />
           <Route path="products" element={<AdminProducts />} />
-          <Route path="analytics" element={<Analytics />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

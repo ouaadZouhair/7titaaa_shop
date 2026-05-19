@@ -17,7 +17,14 @@ const emptyProduct = {
   rating: 0,
   reviews: 0,
   tags: [],
+  quality: 5,
 }
+
+const SectionTitle = ({ children }) => (
+  <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 pb-2 border-b border-gray-100">
+    {children}
+  </p>
+)
 
 function ProductForm({ initial, onClose, onSubmit, submitting }) {
   const [form, setForm] = useState(() =>
@@ -27,10 +34,20 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
   const [error, setError] = useState('')
   const [mainUploading, setMainUploading] = useState(false)
   const [extraUploading, setExtraUploading] = useState(false)
+  const [priceMode, setPriceMode] = useState('dh') // 'dh' | 'pct'
+  const [pctInput, setPctInput] = useState('')
   const mainFileRef = useRef(null)
   const extraFileRef = useRef(null)
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+
+  // sale price computed from original price + discount %
+  const computedSalePrice = (() => {
+    const orig = Number(form.originalPrice)
+    const pct = Number(pctInput)
+    if (!orig || !pct || pct <= 0 || pct >= 100) return null
+    return Math.round(orig * (1 - pct / 100) * 100) / 100
+  })()
 
   const handleMainFile = async (e) => {
     const file = e.target.files?.[0]
@@ -82,15 +99,24 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    if (!form.image) {
-      setError('Please upload a main image')
+    if (!form.image) { setError('Please upload a main image'); return }
+
+    const finalPrice = priceMode === 'pct'
+      ? computedSalePrice
+      : (form.price === '' ? null : Number(form.price))
+
+    if (!finalPrice || finalPrice <= 0) {
+      setError('Please set a valid sale price')
       return
     }
+
     try {
       await onSubmit({
         ...form,
-        price: Number(form.price),
-        originalPrice: form.originalPrice === '' || form.originalPrice == null ? null : Number(form.originalPrice),
+        price: finalPrice,
+        originalPrice: form.originalPrice === '' || form.originalPrice == null
+          ? null
+          : Number(form.originalPrice),
         rating: Number(form.rating) || 0,
         reviews: Number(form.reviews) || 0,
       })
@@ -101,7 +127,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
 
   const input =
     'w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-black focus:bg-white transition-colors'
-  const label = 'font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-1.5'
+  const lbl = 'font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-1.5'
 
   return (
     <motion.div
@@ -111,52 +137,114 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
       onClick={onClose}
     >
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.97 }}
-            transition={{ duration: 0.2 }}
-            className="relative bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <div>
-                <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">
-                  {initial?.id ? 'Edit' : 'New'}
-                </p>
-                <h2 className="text-lg font-semibold">
-                  {initial?.id ? 'Edit product' : 'Add product'}
-                </h2>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-md hover:bg-gray-100 text-gray-500"
-              >
-                <X size={18} />
-              </button>
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.97 }}
+        transition={{ duration: 0.2 }}
+        className="relative bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
+          <div>
+            <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">
+              {initial?.id ? 'Edit' : 'New'}
+            </p>
+            <h2 className="text-lg font-semibold">
+              {initial?.id ? 'Edit product' : 'Add product'}
+            </h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100 text-gray-500">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-6">
+          {error && (
+            <div className="border border-red-200 bg-red-50 rounded-md px-3 py-2 text-sm text-red-700">
+              {error}
             </div>
+          )}
 
-            <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-5">
-              {error && (
-                <div className="border border-red-200 bg-red-50 rounded-md px-3 py-2 text-sm text-red-700">
-                  {error}
+          {/* ── Basic info ── */}
+          <div className="space-y-4">
+            <SectionTitle>Basic info</SectionTitle>
+            <div>
+              <label className={lbl}>Name</label>
+              <input
+                required
+                value={form.name}
+                onChange={(e) => update('name', e.target.value)}
+                placeholder="7titaaa OG Hoodie"
+                className={input}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={lbl}>Category</label>
+                <input
+                  required
+                  value={form.category}
+                  onChange={(e) => update('category', e.target.value)}
+                  placeholder="Hoodies"
+                  className={input}
+                />
+              </div>
+              <div>
+                <label className={lbl}>Size</label>
+                <input
+                  value={form.size}
+                  onChange={(e) => update('size', e.target.value)}
+                  placeholder="M"
+                  className={input}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Pricing ── */}
+          <div className="space-y-3">
+            <SectionTitle>Pricing</SectionTitle>
+
+            <div className="flex gap-4 items-end">
+              {/* Original price */}
+              <div className="flex-1">
+                <label className={lbl}>Original price (DH)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.originalPrice ?? ''}
+                  onChange={(e) => update('originalPrice', e.target.value)}
+                  placeholder="200.00"
+                  className={input}
+                />
+              </div>
+
+              {/* Sale price */}
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={lbl} style={{ marginBottom: 0 }}>Sale price</label>
+                  <div className="flex rounded-md overflow-hidden border border-gray-200 text-[10px] font-mono tracking-widest">
+                    <button
+                      type="button"
+                      onClick={() => setPriceMode('dh')}
+                      className={`px-2.5 py-1 uppercase transition-colors ${priceMode === 'dh' ? 'bg-black text-white' : 'bg-white text-gray-400 hover:text-gray-700'}`}
+                    >
+                      DH
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPriceMode('pct')}
+                      className={`px-2.5 py-1 uppercase transition-colors ${priceMode === 'pct' ? 'bg-black text-white' : 'bg-white text-gray-400 hover:text-gray-700'}`}
+                    >
+                      %
+                    </button>
+                  </div>
                 </div>
-              )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className={label}>Name</label>
-                  <input
-                    required
-                    value={form.name}
-                    onChange={(e) => update('name', e.target.value)}
-                    placeholder="7titaaa OG Hoodie"
-                    className={input}
-                  />
-                </div>
-
-                <div>
-                  <label className={label}>Price</label>
+                {priceMode === 'dh' ? (
                   <input
                     required
                     type="number"
@@ -164,232 +252,241 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                     min="0"
                     value={form.price}
                     onChange={(e) => update('price', e.target.value)}
-                    placeholder="89.99"
+                    placeholder="160.00"
                     className={input}
                   />
-                </div>
-                <div>
-                  <label className={label}>Original price</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={form.originalPrice ?? ''}
-                    onChange={(e) => update('originalPrice', e.target.value)}
-                    placeholder="120.00"
-                    className={input}
-                  />
-                </div>
-
-                <div>
-                  <label className={label}>Category</label>
-                  <input
-                    required
-                    value={form.category}
-                    onChange={(e) => update('category', e.target.value)}
-                    placeholder="Hoodies"
-                    className={input}
-                  />
-                </div>
-                <div>
-                  <label className={label}>Size</label>
-                  <input
-                    value={form.size}
-                    onChange={(e) => update('size', e.target.value)}
-                    placeholder="M"
-                    className={input}
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className={label}>Main image</label>
-                  <input
-                    ref={mainFileRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleMainFile}
-                    className="hidden"
-                  />
-                  <div className="flex items-start gap-3">
-                    {form.image ? (
-                      <div className="relative group">
-                        <img
-                          src={resolveImageUrl(form.image)}
-                          alt="preview"
-                          className="w-32 h-32 object-cover rounded-md bg-gray-100 border border-gray-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => update('image', '')}
-                          className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={11} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => mainFileRef.current?.click()}
-                        className="w-32 h-32 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1.5 text-gray-500 transition-colors"
-                      >
-                        {mainUploading ? (
-                          <Loader2 size={22} className="animate-spin" />
-                        ) : (
-                          <>
-                            <ImagePlus size={22} />
-                            <span className="font-mono text-[9px] tracking-widest uppercase">Upload</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                    <div className="flex-1 pt-1 text-xs text-gray-500">
-                      <p>JPG, PNG, WEBP, GIF or AVIF.</p>
-                      <p>Max 5 MB.</p>
-                      {form.image && (
-                        <button
-                          type="button"
-                          onClick={() => mainFileRef.current?.click()}
-                          disabled={mainUploading}
-                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-black hover:underline disabled:opacity-50"
-                        >
-                          {mainUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                          {mainUploading ? 'Uploading…' : 'Replace image'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className={label}>Additional images</label>
-                  <input
-                    ref={extraFileRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleExtraFiles}
-                    className="hidden"
-                  />
-                  <div className="flex flex-wrap gap-2">
-                    {form.images?.map((url, i) => (
-                      <div key={i} className="relative group">
-                        <img
-                          src={resolveImageUrl(url)}
-                          alt=""
-                          className="w-20 h-20 object-cover rounded-md bg-gray-100 border border-gray-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(i)}
-                          className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={11} />
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => extraFileRef.current?.click()}
-                      disabled={extraUploading}
-                      className="w-20 h-20 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1 text-gray-500 transition-colors disabled:opacity-50"
-                    >
-                      {extraUploading ? (
-                        <Loader2 size={18} className="animate-spin" />
-                      ) : (
-                        <>
-                          <Plus size={18} />
-                          <span className="font-mono text-[8px] tracking-widest uppercase">Add</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className={label}>Description</label>
-                  <textarea
-                    rows={3}
-                    value={form.description}
-                    onChange={(e) => update('description', e.target.value)}
-                    placeholder="The signature 7titaaa hoodie…"
-                    className={input}
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className={label}>Tags</label>
-                  <div className="flex gap-2">
+                ) : (
+                  <div className="relative">
                     <input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                      placeholder="streetwear"
-                      className={input}
+                      type="number"
+                      step="1"
+                      min="1"
+                      max="99"
+                      value={pctInput}
+                      onChange={(e) => setPctInput(e.target.value)}
+                      placeholder="20"
+                      className={input + ' pr-8'}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">%</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Computed result shown below both inputs */}
+            {priceMode === 'pct' && (
+              <div className="flex justify-end">
+                {computedSalePrice != null ? (
+                  <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest">
+                    <span className="text-gray-400">Sale price →</span>
+                    <span className="bg-black text-white px-2 py-0.5 rounded-md font-semibold">
+                      {computedSalePrice.toFixed(2)} DH
+                    </span>
+                  </span>
+                ) : (
+                  <p className="font-mono text-[9px] tracking-widest text-gray-400">
+                    Enter original price + % to compute
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Images ── */}
+          <div className="space-y-4">
+            <SectionTitle>Images</SectionTitle>
+
+            {/* Main image */}
+            <div>
+              <label className={lbl}>Main image</label>
+              <input ref={mainFileRef} type="file" accept="image/*" onChange={handleMainFile} className="hidden" />
+              <div className="flex items-start gap-3">
+                {form.image ? (
+                  <div className="relative group shrink-0">
+                    <img
+                      src={resolveImageUrl(form.image)}
+                      alt="preview"
+                      className="w-28 h-28 object-cover rounded-md bg-gray-100 border border-gray-200"
                     />
                     <button
                       type="button"
-                      onClick={addTag}
-                      className="px-3 rounded-md bg-black text-white text-sm flex items-center gap-1.5 hover:bg-gray-800"
+                      onClick={() => update('image', '')}
+                      className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <Plus size={14} /> Add
+                      <X size={11} />
                     </button>
                   </div>
-                  {form.tags?.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {form.tags.map((t, i) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-xs"
-                        >
-                          {t}
-                          <button type="button" onClick={() => removeTag(i)}>
-                            <X size={10} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => mainFileRef.current?.click()}
+                    className="w-28 h-28 shrink-0 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1.5 text-gray-500 transition-colors"
+                  >
+                    {mainUploading ? <Loader2 size={22} className="animate-spin" /> : (
+                      <><ImagePlus size={22} /><span className="font-mono text-[9px] tracking-widest uppercase">Upload</span></>
+                    )}
+                  </button>
+                )}
+                <div className="flex-1 pt-1 text-xs text-gray-500 space-y-1">
+                  <p>JPG, PNG, WEBP, GIF or AVIF — max 5 MB.</p>
+                  {form.image && (
+                    <button
+                      type="button"
+                      onClick={() => mainFileRef.current?.click()}
+                      disabled={mainUploading}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-black hover:underline disabled:opacity-50"
+                    >
+                      {mainUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                      {mainUploading ? 'Uploading…' : 'Replace image'}
+                    </button>
                   )}
                 </div>
-
-                <div className="flex items-center gap-6 sm:col-span-2 pt-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!form.isNew}
-                      onChange={(e) => update('isNew', e.target.checked)}
-                      className="w-4 h-4 accent-black"
-                    />
-                    <span className="text-sm">Mark as New</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!form.isFeatured}
-                      onChange={(e) => update('isFeatured', e.target.checked)}
-                      className="w-4 h-4 accent-black"
-                    />
-                    <span className="text-sm">Featured</span>
-                  </label>
-                </div>
               </div>
+            </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            {/* Extra images */}
+            <div>
+              <label className={lbl}>Additional images</label>
+              <input ref={extraFileRef} type="file" accept="image/*" multiple onChange={handleExtraFiles} className="hidden" />
+              <div className="flex flex-wrap gap-2">
+                {form.images?.map((url, i) => (
+                  <div key={i} className="relative group">
+                    <img src={resolveImageUrl(url)} alt="" className="w-20 h-20 object-cover rounded-md bg-gray-100 border border-gray-200" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={11} />
+                    </button>
+                  </div>
+                ))}
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-100"
+                  onClick={() => extraFileRef.current?.click()}
+                  disabled={extraUploading}
+                  className="w-20 h-20 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1 text-gray-500 transition-colors disabled:opacity-50"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2 rounded-md bg-black text-white text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
-                >
-                  {submitting ? 'Saving…' : initial?.id ? 'Save changes' : 'Create product'}
+                  {extraUploading ? <Loader2 size={18} className="animate-spin" /> : (
+                    <><Plus size={18} /><span className="font-mono text-[8px] tracking-widest uppercase">Add</span></>
+                  )}
                 </button>
               </div>
-            </form>
+            </div>
+          </div>
+
+          {/* ── Details ── */}
+          <div className="space-y-4">
+            <SectionTitle>Details</SectionTitle>
+
+            <div>
+              <label className={lbl}>Description</label>
+              <textarea
+                rows={3}
+                value={form.description}
+                onChange={(e) => update('description', e.target.value)}
+                placeholder="The signature 7titaaa hoodie…"
+                className={input}
+              />
+            </div>
+
+            <div>
+              <label className={lbl}>Tags</label>
+              <div className="flex gap-2">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  placeholder="streetwear"
+                  className={input}
+                />
+                <button
+                  type="button"
+                  onClick={addTag}
+                  className="px-3 rounded-md bg-black text-white text-sm flex items-center gap-1.5 hover:bg-gray-800 shrink-0"
+                >
+                  <Plus size={14} /> Add
+                </button>
+              </div>
+              {form.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.tags.map((t, i) => (
+                    <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-xs">
+                      {t}
+                      <button type="button" onClick={() => removeTag(i)}><X size={10} /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quality stars */}
+            <div>
+              <label className={lbl}>Quality</label>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => update('quality', star)}
+                    className="p-0.5 transition-transform hover:scale-110 focus:outline-none"
+                    aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                  >
+                    <svg
+                      className={`w-7 h-7 transition-colors ${star <= (form.quality || 0) ? 'text-amber-400' : 'text-gray-200'}`}
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </button>
+                ))}
+                <span className="ml-2 font-mono text-[11px] tracking-widest text-gray-400">
+                  {form.quality || 0}/5
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!form.isNew}
+                  onChange={(e) => update('isNew', e.target.checked)}
+                  className="w-4 h-4 accent-black"
+                />
+                <span className="text-sm">Mark as New</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!form.isFeatured}
+                  onChange={(e) => update('isFeatured', e.target.checked)}
+                  className="w-4 h-4 accent-black"
+                />
+                <span className="text-sm">Featured</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2 rounded-md bg-black text-white text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+            >
+              {submitting ? 'Saving…' : initial?.id ? 'Save changes' : 'Create product'}
+            </button>
+          </div>
+        </form>
       </motion.div>
     </motion.div>
   )

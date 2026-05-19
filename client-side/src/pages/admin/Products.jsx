@@ -147,9 +147,9 @@ export default function Products() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{p.category}</td>
                   <td className="px-4 py-3">
-                    <span className="font-semibold">${p.price.toFixed(2)}</span>
+                    <span className="font-semibold">{p.price.toFixed(2)} DH</span>
                     {p.originalPrice && (
-                      <span className="ml-2 text-xs text-gray-400 line-through">${p.originalPrice.toFixed(2)}</span>
+                      <span className="ml-2 text-xs text-gray-400 line-through">{p.originalPrice.toFixed(2)} DH</span>
                     )}
                   </td>
                   <td className="px-4 py-3">

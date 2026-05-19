@@ -16,36 +16,25 @@ export function CartProvider({ children }) {
     localStorage.setItem('7titaaa_cart', JSON.stringify(cartItems))
   }, [cartItems])
 
-  const addToCart = (product, size = 'M', quantity = 1) => {
+  const addToCart = (product, size = 'M') => {
     setCartItems(prev => {
-      const idx = prev.findIndex(i => i.id === product.id && i.size === size)
-      if (idx >= 0) {
-        const updated = [...prev]
-        updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + quantity }
-        return updated
-      }
-      return [...prev, { ...product, size, quantity }]
+      const exists = prev.some(i => i.id === product.id && i.size === size)
+      if (exists) return prev
+      return [...prev, { ...product, size, quantity: 1 }]
     })
   }
 
   const removeFromCart = (id, size) =>
     setCartItems(prev => prev.filter(i => !(i.id === id && i.size === size)))
 
-  const updateQuantity = (id, size, quantity) => {
-    if (quantity <= 0) { removeFromCart(id, size); return }
-    setCartItems(prev =>
-      prev.map(i => (i.id === id && i.size === size ? { ...i, quantity } : i))
-    )
-  }
-
   const clearCart = () => setCartItems([])
 
-  const cartCount = cartItems.reduce((s, i) => s + i.quantity, 0)
-  const cartTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
+  const cartCount = cartItems.length
+  const cartTotal = cartItems.reduce((s, i) => s + i.price, 0)
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal }}
+      value={{ cartItems, addToCart, removeFromCart, clearCart, cartCount, cartTotal }}
     >
       {children}
     </CartContext.Provider>

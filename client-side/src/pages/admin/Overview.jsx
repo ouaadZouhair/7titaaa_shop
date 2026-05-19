@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { Package, Sparkles, Star, Layers, ArrowUpRight } from 'lucide-react'
+import { Package, Sparkles, Star, Layers, ArrowUpRight, ShoppingBag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../../lib/api'
 import { resolveImageUrl } from '../../lib/uploads'
+
+const STATUS_STYLES = {
+  pending:   'bg-yellow-100 text-yellow-700',
+  confirmed: 'bg-blue-100 text-blue-700',
+  shipped:   'bg-purple-100 text-purple-700',
+  delivered: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
+}
 
 const StatCard = ({ icon: Icon, label, value, delta }) => (
   <motion.div
@@ -29,14 +37,22 @@ const StatCard = ({ icon: Icon, label, value, delta }) => (
 
 export default function Overview() {
   const [data, setData] = useState({ products: { total: 0, featured: 0, new: 0, categories: 0 }, categories: [] })
-  const [recent, setRecent] = useState([])
+  const [recentProducts, setRecentProducts] = useState([])
+  const [recentOrders, setRecentOrders] = useState([])
+  const [ordersTotal, setOrdersTotal] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([api.get('/products/stats'), api.get('/products?limit=5')])
-      .then(([s, r]) => {
+    Promise.all([
+      api.get('/products/stats'),
+      api.get('/products?limit=5'),
+      api.get('/orders', { params: { limit: 5 } }),
+    ])
+      .then(([s, r, o]) => {
         setData(s.data)
-        setRecent(r.data.items)
+        setRecentProducts(r.data.items)
+        setRecentOrders(o.data.orders)
+        setOrdersTotal(o.data.total)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -49,41 +65,73 @@ export default function Overview() {
         <h1 className="text-3xl font-semibold tracking-tight">Overview</h1>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={Package} label="Total Products" value={loading ? '—' : data.products.total} />
-        <StatCard icon={Sparkles} label="New Drops" value={loading ? '—' : data.products.new} />
-        <StatCard icon={Star} label="Featured" value={loading ? '—' : data.products.featured} />
-        <StatCard icon={Layers} label="Categories" value={loading ? '—' : data.products.categories} />
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <StatCard icon={Package}     label="Total Products" value={loading ? '—' : data.products.total} />
+        <StatCard icon={Sparkles}    label="New Drops"      value={loading ? '—' : data.products.new} />
+        <StatCard icon={Star}        label="Featured"       value={loading ? '—' : data.products.featured} />
+        <StatCard icon={Layers}      label="Categories"     value={loading ? '—' : data.products.categories} />
+        <StatCard icon={ShoppingBag} label="Total Orders"   value={loading ? '—' : ordersTotal} />
       </div>
 
+      {/* Bottom panels */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-5">
+
+        {/* Recent products */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">Recent products</h2>
-            <Link
-              to="/admin/products"
-              className="font-mono text-[10px] tracking-widest uppercase text-gray-500 hover:text-black"
-            >
+            <Link to="/admin/products" className="font-mono text-[10px] tracking-widest uppercase text-gray-500 hover:text-black">
               View all →
             </Link>
           </div>
           <div className="divide-y divide-gray-100">
-            {recent.length === 0 && !loading && (
+            {recentProducts.length === 0 && !loading && (
               <p className="text-sm text-gray-400 py-8 text-center">No products yet.</p>
             )}
-            {recent.map((p) => (
+            {recentProducts.map((p) => (
               <div key={p.id} className="flex items-center gap-4 py-3">
                 <img src={resolveImageUrl(p.image)} alt={p.name} className="w-12 h-12 rounded-md object-cover bg-gray-100" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{p.name}</p>
                   <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">{p.category}</p>
                 </div>
-                <p className="text-sm font-semibold">${p.price.toFixed(2)}</p>
+                <p className="text-sm font-semibold">{p.price.toFixed(2)} DH</p>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Recent orders */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold">Recent orders</h2>
+            <Link to="/admin/orders" className="font-mono text-[10px] tracking-widest uppercase text-gray-500 hover:text-black">
+              View all →
+            </Link>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {recentOrders.length === 0 && !loading && (
+              <p className="text-sm text-gray-400 py-8 text-center">No orders yet.</p>
+            )}
+            {recentOrders.map((o) => (
+              <div key={o.id} className="flex items-center gap-3 py-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{o.firstName} {o.lastName}</p>
+                  <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">{o.ref}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-sm font-semibold">{Number(o.total).toFixed(2)} DH</span>
+                  <span className={`font-mono text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-full ${STATUS_STYLES[o.status]}`}>
+                    {o.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Categories */}
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="font-semibold mb-4">Categories</h2>
           <div className="space-y-3">
@@ -98,6 +146,7 @@ export default function Overview() {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   )

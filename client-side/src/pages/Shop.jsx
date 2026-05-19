@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useProducts } from '../hooks/useProducts'
@@ -16,47 +16,60 @@ const SORT_OPTIONS = [
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const initCategory = searchParams.get('category') || 'All'
 
-  const [activeCategory, setActiveCategory] = useState(initCategory)
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'All')
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [sort, setSort] = useState('newest')
-  const [priceRange, setPriceRange] = useState([0, 300])
+  const [priceRange, setPriceRange] = useState([0, 3000])
+  const [qualityFilter, setQualityFilter] = useState(0) // 0 = all, 1-5 = minimum stars
   const [filtersOpen, setFiltersOpen] = useState(false)
+
+  useEffect(() => {
+    const cat = searchParams.get('category') || 'All'
+    const q = searchParams.get('search') || ''
+    setActiveCategory(cat)
+    setSearchQuery(q)
+  }, [searchParams])
 
   const handleCategory = (cat) => {
     setActiveCategory(cat)
+    setSearchQuery('')
     if (cat !== 'All') setSearchParams({ category: cat })
     else setSearchParams({})
   }
 
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSearchParams({})
+  }
+
   const { items, loading } = useProducts({
-    category: activeCategory !== 'All' ? activeCategory : undefined,
+    category: searchQuery ? undefined : (activeCategory !== 'All' ? activeCategory : undefined),
+    search: searchQuery || undefined,
     limit: 100,
   })
 
   const filtered = useMemo(() => {
     let list = [...items]
     list = list.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1])
+    if (qualityFilter > 0) list = list.filter(p => (p.quality ?? 5) === qualityFilter)
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price)
     else if (sort === 'price-desc') list.sort((a, b) => b.price - a.price)
     else if (sort === 'rating') list.sort((a, b) => b.rating - a.rating)
     else list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
     return list
-  }, [items, sort, priceRange])
+  }, [items, sort, priceRange, qualityFilter])
 
   return (
     <div className="min-h-screen bg-white">
       {/* Page header */}
       <div className="relative py-24 px-6 overflow-hidden">
-        {/* Background image */}
         <img
           src={vintageStore}
           alt="Vintage store"
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/60" />
-
         <div className="relative z-10 max-w-7xl mx-auto">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -73,13 +86,32 @@ export default function Shop() {
           >
             THE SHOP
           </motion.h1>
-          {/* <p className="text-white/40 mt-2 font-light">
-            {filtered.length} {filtered.length === 1 ? 'item' : 'items'} found
-          </p> */}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
+
+        {/* Search results indicator */}
+        {searchQuery && (
+          <div className="flex items-center gap-3 mb-6">
+            <span className="font-mono text-xs tracking-widest text-gray-400 uppercase">
+              Results for
+            </span>
+            <span className="font-mono text-xs tracking-widest uppercase bg-street-black text-white px-3 py-1 rounded-sm">
+              "{searchQuery}"
+            </span>
+            <button
+              onClick={clearSearch}
+              aria-label="Clear search"
+              className="text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         {/* Filter bar */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
           {/* Category pills */}
@@ -91,7 +123,7 @@ export default function Shop() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCategory(cat)}
                 className={`px-4 py-2 rounded-sm font-mono text-[11px] tracking-widest uppercase transition-all duration-200 ${
-                  activeCategory === cat
+                  !searchQuery && activeCategory === cat
                     ? 'bg-street-black text-white'
                     : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                 }`}
@@ -135,23 +167,57 @@ export default function Shop() {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <div className="bg-gray-50 rounded-sm p-6 mb-8 flex flex-wrap gap-8">
+              <div className="bg-gray-50 rounded-sm p-6 mb-8 flex flex-wrap gap-10">
+                {/* Price range */}
                 <div>
                   <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
                     Price Range
                   </p>
                   <div className="flex items-center gap-4">
-                    <span className="font-mono text-sm text-gray-600">${priceRange[0]}</span>
+                    <span className="font-mono text-sm text-gray-600">{priceRange[0]} DH</span>
                     <input
                       type="range"
                       min={0}
-                      max={300}
-                      step={10}
+                      max={3000}
+                      step={50}
                       value={priceRange[1]}
                       onChange={e => setPriceRange([priceRange[0], +e.target.value])}
                       className="w-40 accent-primary"
                     />
-                    <span className="font-mono text-sm text-gray-600">${priceRange[1]}</span>
+                    <span className="font-mono text-sm text-gray-600">{priceRange[1]} DH</span>
+                  </div>
+                </div>
+
+                {/* Quality filter */}
+                <div>
+                  <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
+                    Min. Quality
+                  </p>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        onClick={() => setQualityFilter(qualityFilter === star ? 0 : star)}
+                        className="p-0.5 transition-transform hover:scale-110 focus:outline-none"
+                        aria-label={`Filter by ${star} star minimum`}
+                      >
+                        <svg
+                          className={`w-6 h-6 transition-colors ${star <= qualityFilter ? 'text-amber-400' : 'text-gray-300 hover:text-amber-200'}`}
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      </button>
+                    ))}
+                    {qualityFilter > 0 && (
+                      <button
+                        onClick={() => setQualityFilter(0)}
+                        className="ml-2 font-mono text-[10px] tracking-widest text-gray-400 hover:text-gray-700 uppercase transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

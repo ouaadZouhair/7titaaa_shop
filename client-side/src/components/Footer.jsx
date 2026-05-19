@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
+import logo from '../assets/7titaaa_logo2.png'
 
 const socials = [
   {
@@ -43,9 +44,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="md:col-span-2">
             <Link to="/" className="inline-block mb-4">
-              <span className="font-display text-4xl text-white tracking-[0.1em]">7TITAAA</span>
-              <br />
-              <span className="font-mono text-[9px] tracking-[0.5em] text-primary-light uppercase">Street Culture</span>
+              <img src={logo} alt="7titaaa" className="h-24 w-auto" />
             </Link>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs font-light">
               Premium streetwear rooted in hip-hop culture. Worn by creators, built for the streets.
@@ -108,13 +107,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/5 mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[10px] text-white/20 tracking-widest uppercase">
+        <div className="border-t border-white/40 mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="font-mono text-[10px] text-white tracking-widest uppercase">
             © {new Date().getFullYear()} 7titaaa Shop. All rights reserved.
           </p>
-          <p className="font-mono text-[10px] text-white/20 tracking-widest uppercase">
-            Made for the streets
-          </p>
+          <a
+            href="https://zouhairod.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[10px] text-white hover:text-white/70 tracking-widest uppercase transition-colors"
+          >
+            Created by ZouhairOD
+          </a>
         </div>
       </div>
     </footer>
