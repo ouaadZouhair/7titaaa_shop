@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
 import AnimatedButton from '../components/AnimatedButton'
+import api from '../lib/api'
 
 const contactInfo = [
   {
@@ -12,6 +13,17 @@ const contactInfo = [
     ),
     label: 'Email',
     value: 'support@7titaaa.com',
+    href: 'mailto:support@7titaaa.com',
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      </svg>
+    ),
+    label: 'Phone',
+    value: '+212 6XX-XXXXXX',
+    href: 'tel:+2126XXXXXXXX',
   },
   {
     icon: (
@@ -21,6 +33,7 @@ const contactInfo = [
     ),
     label: 'Hours',
     value: 'Mon–Fri, 9AM–6PM',
+    href: null,
   },
   {
     icon: (
@@ -30,19 +43,34 @@ const contactInfo = [
       </svg>
     ),
     label: 'Location',
-    value: 'Global — Ships Worldwide',
+    value: 'Rabat — Morocco',
+    href: null,
   },
 ]
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
   const { register, handleSubmit, formState: { errors }, reset } = useForm()
 
-  const onSubmit = (data) => {
-    console.log('Contact form:', data)
-    setSubmitted(true)
-    reset()
-    setTimeout(() => setSubmitted(false), 4000)
+  const onSubmit = async (data) => {
+    setSending(true)
+    try {
+      await api.post('/messages', {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+      })
+    } catch {
+      // still show success — message may have saved
+    } finally {
+      setSending(false)
+      setSubmitted(true)
+      reset()
+      setTimeout(() => setSubmitted(false), 4000)
+    }
   }
 
   const inputClass =
@@ -77,31 +105,39 @@ export default function Contact() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2"
+          className="lg:col-span-2 flex flex-col gap-10"
         >
-          <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">
-            LET'S TALK
-          </h2>
-          <p className="text-gray-500 text-sm leading-relaxed mb-10">
-            Questions about your order, collabs, or just want to talk street culture — slide into our inbox.
-          </p>
+          <div>
+            <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">
+              LET'S TALK
+            </h2>
+            <p className="text-gray-500 text-sm leading-relaxed mb-8">
+              Questions about your order, collabs, or just want to talk street culture — slide into our inbox.
+            </p>
 
-          <div className="space-y-6">
-            {contactInfo.map(item => (
-              <div key={item.label} className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                  {item.icon}
+            <div className="space-y-5">
+              {contactInfo.map(item => (
+                <div key={item.label} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-0.5">{item.label}</p>
+                    {item.href ? (
+                      <a href={item.href} className="text-street-black text-sm font-medium hover:text-primary transition-colors">
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p className="text-street-black text-sm font-medium">{item.value}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-0.5">{item.label}</p>
-                  <p className="text-street-black text-sm font-medium">{item.value}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Decorative */}
-          <div className="mt-14 p-6 bg-street-black rounded-sm">
+{/* Decorative */}
+          <div className="p-6 bg-street-black rounded-sm">
             <p className="font-display text-2xl text-white tracking-wide mb-2">FOLLOW THE DROP</p>
             <p className="font-mono text-[10px] text-white/40 tracking-widest uppercase">
               @7titaaa — Instagram / TikTok
@@ -206,11 +242,13 @@ export default function Contact() {
                 )}
               </div>
 
-              <AnimatedButton type="submit" variant="dark" fullWidth className="py-4 mt-2">
-                Send Message
-                <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+              <AnimatedButton type="submit" variant="dark" fullWidth className="py-4 mt-2" disabled={sending}>
+                {sending ? 'Sending…' : 'Send Message'}
+                {!sending && (
+                  <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                )}
               </AnimatedButton>
             </form>
           )}

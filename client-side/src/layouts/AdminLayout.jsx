@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   ShoppingBag,
+  MessageSquare,
 } from 'lucide-react'
 import logo from '../assets/7titaaa_logo2.png'
 import { useAuth } from '../context/AuthContext'
@@ -16,6 +17,7 @@ const navItems = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/admin/products', label: 'Products', icon: Package },
   { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+  { to: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 

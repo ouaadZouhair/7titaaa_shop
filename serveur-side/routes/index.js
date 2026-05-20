@@ -4,6 +4,7 @@ import authRouter from "./auth.js";
 import productsRouter from "./products.js";
 import uploadsRouter from "./uploads.js";
 import ordersRouter from "./orders.js";
+import messagesRouter from "./messages.js";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use("/auth", authRouter);
 router.use("/products", productsRouter);
 router.use("/uploads", uploadsRouter);
 router.use("/orders", ordersRouter);
+router.use("/messages", messagesRouter);
 
 export default router;

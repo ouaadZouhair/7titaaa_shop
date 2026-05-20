@@ -15,6 +15,7 @@ import AdminLayout from './layouts/AdminLayout'
 import Overview from './pages/admin/Overview'
 import AdminProducts from './pages/admin/Products'
 import AdminOrders from './pages/admin/Orders'
+import AdminMessages from './pages/admin/Messages'
 import Settings from './pages/admin/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -58,6 +59,7 @@ export default function App() {
           <Route index element={<Overview />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="messages" element={<AdminMessages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
