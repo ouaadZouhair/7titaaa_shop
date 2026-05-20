@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { Package, Sparkles, Star, Layers, ArrowUpRight, ShoppingBag } from 'lucide-react'
+import { Package, Sparkles, Star, Layers, ArrowUpRight, ShoppingBag, Mail, MailOpen } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../../lib/api'
 import { resolveImageUrl } from '../../lib/uploads'
+import { useAdminCounts } from '../../context/AdminCountsContext'
 
 const STATUS_STYLES = {
   pending:   'bg-yellow-100 text-yellow-700',
@@ -40,23 +41,29 @@ export default function Overview() {
   const [recentProducts, setRecentProducts] = useState([])
   const [recentOrders, setRecentOrders] = useState([])
   const [ordersTotal, setOrdersTotal] = useState(0)
+  const [recentMessages, setRecentMessages] = useState([])
   const [loading, setLoading] = useState(true)
+  const { counts: adminCounts, setMessages: setGlobalMessageCount } = useAdminCounts()
+  const messagesUnread = adminCounts.messages
 
   useEffect(() => {
     Promise.all([
       api.get('/products/stats'),
       api.get('/products?limit=5'),
       api.get('/orders', { params: { limit: 5 } }),
+      api.get('/messages', { params: { limit: 5 } }),
     ])
-      .then(([s, r, o]) => {
+      .then(([s, r, o, m]) => {
         setData(s.data)
         setRecentProducts(r.data.items)
         setRecentOrders(o.data.orders)
         setOrdersTotal(o.data.total)
+        setRecentMessages(m.data.items || [])
+        setGlobalMessageCount(m.data.unread)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [setGlobalMessageCount])
 
   return (
     <div>
@@ -75,7 +82,7 @@ export default function Overview() {
       </div>
 
       {/* Bottom panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
 
         {/* Recent products */}
         <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -126,6 +133,46 @@ export default function Overview() {
                     {o.status}
                   </span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent messages */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold flex items-center gap-2">
+              Recent messages
+              {messagesUnread > 0 && (
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                  {messagesUnread}
+                </span>
+              )}
+            </h2>
+            <Link to="/admin/messages" className="font-mono text-[10px] tracking-widest uppercase text-gray-500 hover:text-black">
+              View all →
+            </Link>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {recentMessages.length === 0 && !loading && (
+              <p className="text-sm text-gray-400 py-8 text-center">No messages yet.</p>
+            )}
+            {recentMessages.map((m) => (
+              <div key={m.id} className="flex items-start gap-3 py-3">
+                <div className={`shrink-0 mt-0.5 ${!m.isRead ? 'text-primary' : 'text-gray-300'}`}>
+                  {m.isRead ? <MailOpen size={16} /> : <Mail size={16} />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm truncate ${!m.isRead ? 'font-semibold text-gray-900' : 'font-medium text-gray-600'}`}>
+                    {m.firstName} {m.lastName}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {m.message?.substring(0, 60)}{(m.message?.length || 0) > 60 ? '…' : ''}
+                  </p>
+                </div>
+                {!m.isRead && (
+                  <span className="shrink-0 mt-1.5 w-2 h-2 rounded-full bg-red-500" />
+                )}
               </div>
             ))}
           </div>

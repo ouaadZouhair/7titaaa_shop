@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Mail, MailOpen, Trash2, RefreshCw } from 'lucide-react'
 import api from '../../lib/api'
+import { useAdminCounts } from '../../context/AdminCountsContext'
 
 const SUBJECT_LABELS = {
   order: 'Order Issue',
@@ -23,6 +24,7 @@ export default function Messages() {
   const [unread, setUnread] = useState(0)
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(null)
+  const { setMessages: setGlobalMessageCount, decrementMessages, incrementMessages } = useAdminCounts()
 
   const load = async () => {
     setLoading(true)
@@ -31,6 +33,7 @@ export default function Messages() {
       setMessages(res.data.items)
       setTotal(res.data.total)
       setUnread(res.data.unread)
+      setGlobalMessageCount(res.data.unread)
     } catch {
       // silent
     } finally {
@@ -50,15 +53,21 @@ export default function Messages() {
       await api.patch(`/messages/${msg.id}/read`, { isRead: true }).catch(() => {})
       setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, isRead: true } : m))
       setUnread(prev => Math.max(0, prev - 1))
+      decrementMessages()
     }
   }
 
   const handleDelete = async (id, e) => {
     e.stopPropagation()
+    const target = messages.find(m => m.id === id)
     await api.delete(`/messages/${id}`).catch(() => {})
     setMessages(prev => prev.filter(m => m.id !== id))
     if (expanded?.id === id) setExpanded(null)
     setTotal(prev => prev - 1)
+    if (target && !target.isRead) {
+      setUnread(prev => Math.max(0, prev - 1))
+      decrementMessages()
+    }
   }
 
   const handleMarkUnread = async (msg, e) => {
@@ -67,6 +76,7 @@ export default function Messages() {
     setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, isRead: false } : m))
     if (expanded?.id === msg.id) setExpanded(null)
     setUnread(prev => prev + 1)
+    incrementMessages()
   }
 
   return (

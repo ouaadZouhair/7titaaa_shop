@@ -12,19 +12,29 @@ import {
 } from 'lucide-react'
 import logo from '../assets/7titaaa_logo2.png'
 import { useAuth } from '../context/AuthContext'
-
-const navItems = [
-  { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
-  { to: '/admin/products', label: 'Products', icon: Package },
-  { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-  { to: '/admin/messages', label: 'Messages', icon: MessageSquare },
-  { to: '/admin/settings', label: 'Settings', icon: Settings },
-]
+import { AdminCountsProvider, useAdminCounts } from '../context/AdminCountsContext'
 
 export default function AdminLayout() {
+  return (
+    <AdminCountsProvider>
+      <AdminShell />
+    </AdminCountsProvider>
+  )
+}
+
+function AdminShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { counts } = useAdminCounts()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+
+  const navItems = [
+    { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
+    { to: '/admin/products', label: 'Products', icon: Package },
+    { to: '/admin/orders', label: 'Orders', icon: ShoppingBag, count: counts.orders },
+    { to: '/admin/messages', label: 'Messages', icon: MessageSquare, count: counts.messages },
+    { to: '/admin/settings', label: 'Settings', icon: Settings },
+  ]
 
   const handleLogout = () => {
     logout()
@@ -62,22 +72,31 @@ export default function AdminLayout() {
           <p className="px-3 mb-3 font-mono text-[10px] tracking-widest uppercase text-white/40">
             Menu
           </p>
-          {navItems.map(({ to, label, icon: Icon, end }) => (
+          {navItems.map(({ to, label, icon: Icon, end, count }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+                `group flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'bg-white text-black font-medium'
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`
               }
             >
-              <Icon size={18} />
-              {label}
+              {() => (
+                <>
+                  <Icon size={18} />
+                  <span className="flex-1">{label}</span>
+                  {count > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                      {count}
+                    </span>
+                  )}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -119,7 +138,7 @@ export default function AdminLayout() {
             </div>
 
             <div className="flex items-center gap-2">
-<Link
+              <Link
                 to="/"
                 className="font-mono text-[10px] tracking-widest uppercase px-4 py-2 rounded-md bg-black text-white hover:bg-gray-800 transition-colors"
               >
