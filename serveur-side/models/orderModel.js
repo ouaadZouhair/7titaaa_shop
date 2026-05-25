@@ -1,28 +1,29 @@
-import { pool } from "../config/db.js";
+import { query, getClient, toPg } from "../config/db.js";
 
 export const ensureOrdersTable = async () => {
-  await pool.query(`
+  await query(`
     CREATE TABLE IF NOT EXISTS orders (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       ref VARCHAR(20) NOT NULL UNIQUE,
-      status ENUM('pending','confirmed','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending','confirmed','shipped','delivered','cancelled')),
       first_name VARCHAR(100) NOT NULL,
       last_name VARCHAR(100) NOT NULL,
       phone VARCHAR(50) NOT NULL,
       email VARCHAR(200) NOT NULL,
       address TEXT NOT NULL,
       city VARCHAR(100) NOT NULL,
-      subtotal DECIMAL(10,2) NOT NULL,
-      shipping DECIMAL(10,2) NOT NULL DEFAULT 0,
-      total DECIMAL(10,2) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_status (status),
-      INDEX idx_created (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      subtotal NUMERIC(10,2) NOT NULL,
+      shipping NUMERIC(10,2) NOT NULL DEFAULT 0,
+      total NUMERIC(10,2) NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
+  await query(`CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at)`);
   // Drop legacy JSON column from tables that pre-date this migration
-  await pool.query(`ALTER TABLE orders DROP COLUMN IF EXISTS items`).catch(() => {});
+  await query(`ALTER TABLE orders DROP COLUMN IF EXISTS items`).catch(() => {});
 };
 
 /**
@@ -33,24 +34,22 @@ export const ensureOrdersTable = async () => {
  * product is removed while still recording what was ordered.
  */
 export const ensureOrderItemsTable = async () => {
-  await pool.query(`
+  await query(`
     CREATE TABLE IF NOT EXISTS order_items (
-      id           INT AUTO_INCREMENT PRIMARY KEY,
-      order_id     INT NOT NULL,
-      product_id   INT NULL,
+      id           SERIAL PRIMARY KEY,
+      order_id     INT NOT NULL REFERENCES orders(id)   ON DELETE CASCADE,
+      product_id   INT          REFERENCES products(id) ON DELETE SET NULL,
       quantity     INT NOT NULL DEFAULT 1,
-      unit_price   DECIMAL(10,2) NOT NULL,
+      unit_price   NUMERIC(10,2) NOT NULL,
       name         VARCHAR(190) NOT NULL,
-      image        VARCHAR(500) NULL,
-      size         VARCHAR(20) NULL,
-      type         VARCHAR(20) NULL DEFAULT 'Normal',
-      created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT fk_oi_order   FOREIGN KEY (order_id)   REFERENCES orders(id)   ON DELETE CASCADE,
-      CONSTRAINT fk_oi_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
-      INDEX idx_oi_order_id   (order_id),
-      INDEX idx_oi_product_id (product_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      image        VARCHAR(500),
+      size         VARCHAR(20),
+      type         VARCHAR(20) DEFAULT 'Normal',
+      created_at   TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
+  await query(`CREATE INDEX IF NOT EXISTS idx_oi_order_id ON order_items(order_id)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_oi_product_id ON order_items(product_id)`);
 };
 
 const rowToOrder = (row) => ({
@@ -72,56 +71,66 @@ const rowToOrder = (row) => ({
 
 export const createOrder = async ({ firstName, lastName, phone, email, address, city, subtotal, shipping, total, items }) => {
   const ref = `7T-${Math.floor(Math.random() * 90000 + 10000)}`;
-  const conn = await pool.getConnection();
+  const client = await getClient();
   try {
-    await conn.beginTransaction();
+    await client.query("BEGIN");
 
     // 1. Insert the order header
-    const [result] = await conn.query(
-      `INSERT INTO orders (ref, first_name, last_name, phone, email, address, city, subtotal, shipping, total)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    const ins = await client.query(
+      toPg(`INSERT INTO orders (ref, first_name, last_name, phone, email, address, city, subtotal, shipping, total)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`),
       [ref, firstName, lastName, phone, email, address, city, subtotal, shipping, total]
     );
-    const orderId = result.insertId;
+    const orderId = ins.rows[0].id;
 
     // 2. Insert each item into order_items (FK link to products)
     if (Array.isArray(items) && items.length > 0) {
-      const itemRows = items.map((item) => [
-        orderId,
-        item.id || item.productId || null,   // product_id (FK) — null if not provided
-        item.quantity || 1,
-        item.price ?? item.unit_price ?? 0,  // snapshot price
-        item.name || "",                      // snapshot name
-        item.image || null,                   // snapshot image
-        item.size || null,
-        item.type || 'Normal',
-      ]);
-      await conn.query(
+      const cols = 8; // order_id, product_id, quantity, unit_price, name, image, size, type
+      const values = [];
+      const tuples = items.map((item, idx) => {
+        const base = idx * cols;
+        values.push(
+          orderId,
+          item.id || item.productId || null,  // product_id (FK) — null if not provided
+          item.quantity || 1,
+          item.price ?? item.unit_price ?? 0,  // snapshot price
+          item.name || "",                      // snapshot name
+          item.image || null,                   // snapshot image
+          item.size || null,
+          item.type || 'Normal'
+        );
+        const ph = Array.from({ length: cols }, (_, j) => `$${base + j + 1}`);
+        return `(${ph.join(", ")})`;
+      });
+      await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, unit_price, name, image, size, type)
-         VALUES ?`,
-        [itemRows]
+         VALUES ${tuples.join(", ")}`,
+        values
       );
     }
 
-    await conn.commit();
+    await client.query("COMMIT");
 
-    const [rows] = await conn.query("SELECT * FROM orders WHERE id = ? LIMIT 1", [orderId]);
+    const { rows } = await client.query(
+      toPg("SELECT * FROM orders WHERE id = ? LIMIT 1"),
+      [orderId]
+    );
     const order = rowToOrder(rows[0]);
     // Attach the relational items
-    const [ois] = await conn.query(
-      `SELECT oi.*, p.category, p.rating
-       FROM order_items oi
-       LEFT JOIN products p ON p.id = oi.product_id
-       WHERE oi.order_id = ?`,
+    const { rows: ois } = await client.query(
+      toPg(`SELECT oi.*, p.category, p.rating
+            FROM order_items oi
+            LEFT JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = ?`),
       [orderId]
     );
     order.orderItems = ois;
     return order;
   } catch (err) {
-    await conn.rollback();
+    await client.query("ROLLBACK");
     throw err;
   } finally {
-    conn.release();
+    client.release();
   }
 };
 
@@ -131,11 +140,11 @@ export const listOrders = async ({ limit = 50, offset = 0, status } = {}) => {
   const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 200));
   const safeOffset = Math.max(0, Number(offset) || 0);
 
-  const [rows] = await pool.query(
+  const { rows } = await query(
     `SELECT * FROM orders ${where} ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`,
     params
   );
-  const [countRows] = await pool.query(
+  const { rows: countRows } = await query(
     `SELECT COUNT(*) AS total FROM orders ${where}`,
     params
   );
@@ -145,11 +154,11 @@ export const listOrders = async ({ limit = 50, offset = 0, status } = {}) => {
   // Enrich each order with relational order_items (joined to products)
   if (orders.length > 0) {
     const orderIds = orders.map((o) => o.id);
-    const [ois] = await pool.query(
+    const { rows: ois } = await query(
       `SELECT oi.*, p.category, p.rating
        FROM order_items oi
        LEFT JOIN products p ON p.id = oi.product_id
-       WHERE oi.order_id IN (?)`,
+       WHERE oi.order_id = ANY(?)`,
       [orderIds]
     );
     const itemsByOrder = {};
@@ -162,14 +171,14 @@ export const listOrders = async ({ limit = 50, offset = 0, status } = {}) => {
     }
   }
 
-  return { orders, total: countRows[0].total };
+  return { orders, total: Number(countRows[0].total) };
 };
 
 export const getOrderById = async (id) => {
-  const [rows] = await pool.query("SELECT * FROM orders WHERE id = ? LIMIT 1", [id]);
+  const { rows } = await query("SELECT * FROM orders WHERE id = ? LIMIT 1", [id]);
   if (!rows[0]) return null;
   const order = rowToOrder(rows[0]);
-  const [ois] = await pool.query(
+  const { rows: ois } = await query(
     `SELECT oi.*, p.category, p.rating
      FROM order_items oi
      LEFT JOIN products p ON p.id = oi.product_id
@@ -181,8 +190,8 @@ export const getOrderById = async (id) => {
 };
 
 export const updateOrderStatus = async (id, status) => {
-  await pool.query("UPDATE orders SET status = ? WHERE id = ?", [status, id]);
-  const [rows] = await pool.query("SELECT * FROM orders WHERE id = ? LIMIT 1", [id]);
+  await query("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?", [status, id]);
+  const { rows } = await query("SELECT * FROM orders WHERE id = ? LIMIT 1", [id]);
   if (!rows[0]) return null;
   return rowToOrder(rows[0]);
 };

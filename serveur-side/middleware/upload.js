@@ -1,14 +1,28 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import os from "os";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
 
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+/**
+ * NOTE: Vercel's serverless filesystem is read-only except for /tmp, which is
+ * ephemeral (wiped between invocations). So disk uploads do NOT persist in
+ * production — this keeps the route from crashing on cold start, but to
+ * actually store images, switch to Supabase Storage (see DEPLOYMENT.md).
+ */
+export const UPLOADS_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), "uploads")
+  : path.join(__dirname, "..", "uploads");
+
+try {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch {
+  // Read-only FS — ignore; uploads simply won't persist here.
 }
 
 const ALLOWED_MIME = new Set([

@@ -1,32 +1,44 @@
-import mysql from "mysql2/promise";
+import pg from "pg";
 import "dotenv/config";
 
-const DB_HOST = process.env.DB_HOST || "localhost";
-const DB_PORT = Number(process.env.DB_PORT) || 3306;
-const DB_USER = process.env.DB_USER || "root";
-const DB_PASSWORD = process.env.DB_PASSWORD || "";
-const DB_NAME = process.env.DB_NAME || "7titaaa_shop";
+const { Pool } = pg;
 
-export const ensureDatabase = async () => {
-  const conn = await mysql.createConnection({
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-  });
-  await conn.query(
-    `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+/**
+ * Supabase gives you a Postgres connection string. Use the **connection
+ * pooler** URI (Project → Settings → Database → "Connection pooling",
+ * Transaction mode, port 6543) for serverless / Vercel — it survives the
+ * many short-lived connections a serverless function creates.
+ *
+ *   DATABASE_URL=postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
+ */
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.warn(
+    "DATABASE_URL is not set — set it to your Supabase Postgres connection string."
   );
-  await conn.end();
+}
+
+export const pool = new Pool({
+  connectionString,
+  // Supabase requires SSL. rejectUnauthorized:false avoids bundling the CA cert.
+  ssl: connectionString ? { rejectUnauthorized: false } : false,
+  // Keep the pool tiny on serverless: each warm instance holds its own pool.
+  max: process.env.VERCEL ? 1 : 10,
+});
+
+/**
+ * The models were written with MySQL-style `?` placeholders. Postgres uses
+ * positional `$1, $2, …`, so we rewrite them in order. (Safe here: none of
+ * our SQL contains a literal `?` inside a string or a jsonb `?` operator.)
+ */
+export const toPg = (sql) => {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
 };
 
-export const pool = mysql.createPool({
-  host: DB_HOST,
-  port: DB_PORT,
-  user: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+/** Run a query with `?` placeholders. Returns the pg result ({ rows, rowCount }). */
+export const query = (text, params = []) => pool.query(toPg(text), params);
+
+/** Grab a dedicated client for a transaction. Caller must release() it. */
+export const getClient = () => pool.connect();

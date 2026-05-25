@@ -1,35 +1,37 @@
-import { pool } from "../config/db.js";
+import { query } from "../config/db.js";
 
 export const ensureProductsTable = async () => {
-  await pool.query(`
+  await query(`
     CREATE TABLE IF NOT EXISTS products (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       name VARCHAR(190) NOT NULL,
-      price DECIMAL(10,2) NOT NULL,
-      original_price DECIMAL(10,2) NULL,
+      price NUMERIC(10,2) NOT NULL,
+      original_price NUMERIC(10,2),
       category VARCHAR(100) NOT NULL,
       image VARCHAR(500) NOT NULL,
-      images JSON NULL,
-      description TEXT NULL,
-      size VARCHAR(20) NULL,
-      type VARCHAR(20) NULL DEFAULT 'Normal',
-      is_new TINYINT(1) NOT NULL DEFAULT 0,
-      is_featured TINYINT(1) NOT NULL DEFAULT 0,
-      rating DECIMAL(2,1) NOT NULL DEFAULT 0,
+      images JSONB,
+      description TEXT,
+      size VARCHAR(20),
+      type VARCHAR(20) DEFAULT 'Normal',
+      is_new BOOLEAN NOT NULL DEFAULT FALSE,
+      is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+      rating NUMERIC(2,1) NOT NULL DEFAULT 0,
       reviews INT NOT NULL DEFAULT 0,
-      tags JSON NULL,
-      quality TINYINT(1) NOT NULL DEFAULT 5,
-      is_available TINYINT(1) NOT NULL DEFAULT 1,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      INDEX idx_category (category),
-      INDEX idx_featured (is_featured),
-      INDEX idx_new (is_new)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      tags JSONB,
+      quality SMALLINT NOT NULL DEFAULT 5,
+      is_available BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
+
+  await query(`CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_products_featured ON products(is_featured)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_products_new ON products(is_new)`);
+
   // migrations for columns added after initial release
-  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS quality TINYINT(1) NOT NULL DEFAULT 5`).catch(() => {});
-  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS type VARCHAR(20) NULL DEFAULT 'Normal'`).catch(() => {});
-  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS is_available TINYINT(1) NOT NULL DEFAULT 1`).catch(() => {});
+  await query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS quality SMALLINT NOT NULL DEFAULT 5`).catch(() => {});
+  await query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'Normal'`).catch(() => {});
+  await query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS is_available BOOLEAN NOT NULL DEFAULT TRUE`).catch(() => {});
 };
 
 const rowToProduct = (row) => {
@@ -65,7 +67,8 @@ export const listProducts = async ({ search, category, limit = 100, offset = 0 }
   const where = [];
   const params = [];
   if (search) {
-    where.push("(name LIKE ? OR description LIKE ? OR tags LIKE ?)");
+    // tags is JSONB — cast to text so the LIKE applies to its raw contents.
+    where.push("(name ILIKE ? OR description ILIKE ? OR tags::text ILIKE ?)");
     params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
   if (category && category !== "all") {
@@ -77,19 +80,19 @@ export const listProducts = async ({ search, category, limit = 100, offset = 0 }
   const safeLimit = Math.max(1, Math.min(Number(limit) || 100, 200));
   const safeOffset = Math.max(0, Number(offset) || 0);
 
-  const [rows] = await pool.query(
+  const { rows } = await query(
     `SELECT * FROM products ${whereSql} ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`,
     params
   );
-  const [countRows] = await pool.query(
+  const { rows: countRows } = await query(
     `SELECT COUNT(*) AS total FROM products ${whereSql}`,
     params
   );
-  return { items: rows.map(rowToProduct), total: countRows[0].total };
+  return { items: rows.map(rowToProduct), total: Number(countRows[0].total) };
 };
 
 export const getProductById = async (id) => {
-  const [rows] = await pool.query("SELECT * FROM products WHERE id = ? LIMIT 1", [id]);
+  const { rows } = await query("SELECT * FROM products WHERE id = ? LIMIT 1", [id]);
   return rowToProduct(rows[0]);
 };
 
@@ -103,31 +106,31 @@ const toRow = (p) => ({
   description: p.description || null,
   size: p.size || null,
   type: p.type || 'Normal',
-  is_new: p.isNew ? 1 : 0,
-  is_featured: p.isFeatured ? 1 : 0,
+  is_new: !!p.isNew,
+  is_featured: !!p.isFeatured,
   rating: p.rating ?? 0,
   reviews: p.reviews ?? 0,
   tags: JSON.stringify(p.tags || []),
   quality: Math.min(5, Math.max(1, Number(p.quality) || 5)),
-  is_available: p.isAvailable === false ? 0 : 1,
+  is_available: p.isAvailable !== false,
 });
 
 export const createProduct = async (p) => {
   const row = toRow(p);
-  const [result] = await pool.query(
+  const { rows } = await query(
     `INSERT INTO products (name, price, original_price, category, image, images, description, size, type, is_new, is_featured, rating, reviews, tags, quality, is_available)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
     [
       row.name, row.price, row.original_price, row.category, row.image, row.images,
       row.description, row.size, row.type, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality, row.is_available,
     ]
   );
-  return getProductById(result.insertId);
+  return getProductById(rows[0].id);
 };
 
 export const updateProduct = async (id, p) => {
   const row = toRow(p);
-  await pool.query(
+  await query(
     `UPDATE products SET name=?, price=?, original_price=?, category=?, image=?, images=?, description=?, size=?, type=?, is_new=?, is_featured=?, rating=?, reviews=?, tags=?, quality=?, is_available=?
      WHERE id=?`,
     [
@@ -140,35 +143,35 @@ export const updateProduct = async (id, p) => {
 };
 
 export const setProductAvailability = async (id, isAvailable) => {
-  await pool.query("UPDATE products SET is_available = ? WHERE id = ?", [isAvailable ? 1 : 0, id]);
+  await query("UPDATE products SET is_available = ? WHERE id = ?", [!!isAvailable, id]);
   return getProductById(id);
 };
 
 export const deleteProduct = async (id) => {
-  const [result] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
-  return result.affectedRows > 0;
+  const result = await query("DELETE FROM products WHERE id = ?", [id]);
+  return result.rowCount > 0;
 };
 
 export const countProducts = async () => {
-  const [rows] = await pool.query(
+  const { rows } = await query(
     `SELECT
        COUNT(*) AS total,
-       SUM(is_featured) AS featured,
-       SUM(is_new) AS new_count,
+       COUNT(*) FILTER (WHERE is_featured) AS featured,
+       COUNT(*) FILTER (WHERE is_new) AS new_count,
        COUNT(DISTINCT category) AS categories
      FROM products`
   );
   return {
-    total: rows[0].total || 0,
+    total: Number(rows[0].total) || 0,
     featured: Number(rows[0].featured) || 0,
     new: Number(rows[0].new_count) || 0,
-    categories: rows[0].categories || 0,
+    categories: Number(rows[0].categories) || 0,
   };
 };
 
 export const listCategories = async () => {
-  const [rows] = await pool.query(
+  const { rows } = await query(
     "SELECT category, COUNT(*) AS count FROM products GROUP BY category ORDER BY count DESC"
   );
-  return rows;
+  return rows.map((r) => ({ category: r.category, count: Number(r.count) }));
 };

@@ -24,7 +24,11 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:5000/api/uploads)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5000/uploads/nonexistent.jpg)",
       "PowerShell(cd \"c:\\\\Users\\\\zouha\\\\Desktop\\\\7titaa\\\\7titaaa_shop\\\\client-side\"; $proc = Start-Process -FilePath \"npm\" -ArgumentList \"run\",\"dev\" -PassThru -WindowStyle Hidden; Start-Sleep -Seconds 8; if \\(!$proc.HasExited\\) { \"Dev server started OK \\(PID $\\($proc.Id\\)\\)\" } else { \"Server exited with code $\\($proc.ExitCode\\)\" }; $proc | Stop-Process -Force -ErrorAction SilentlyContinue)",
-      "Bash(timeout 10 npm run dev)"
+      "Bash(timeout 10 npm run dev)",
+      "Bash(npm uninstall *)",
+      "Bash(node --input-type=module -e \"import\\('./app.js'\\).then\\(\\(\\)=>console.log\\('app.js + all routes/models/middleware load OK'\\)\\).catch\\(e=>{console.error\\('LOAD ERROR:',e\\); process.exit\\(1\\)}\\)\")",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(node --check scripts/createAdmin.js)"
     ]
   }
 }
