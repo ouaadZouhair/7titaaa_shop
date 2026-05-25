@@ -1,8 +1,10 @@
 import { motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function CategoryCard({ category, className = '' }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <motion.div
@@ -34,7 +36,7 @@ export default function CategoryCard({ category, className = '' }) {
           whileHover={{ y: 0, opacity: 1 }}
           className="font-mono text-[10px] text-primary-light tracking-widest uppercase mb-1"
         >
-          {category.count} items
+          {t('category.items', { count: category.count })}
         </motion.p>
         <h3 className="font-display text-2xl text-white tracking-wider uppercase">
           {category.name}

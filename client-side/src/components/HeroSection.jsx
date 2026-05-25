@@ -138,19 +138,19 @@ export default function HeroSection() {
         >
           <Link
             to="/shop"
-            className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden"
+            className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden bg-white"
           >
             <span className="absolute inset-0 border-2 border-white" />
-            <span className="absolute inset-0 bg-white translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-            <span className="relative font-mono text-xs sm:text-sm tracking-[0.35em] uppercase text-white group-hover:text-black transition-colors duration-300 font-bold">
+            <span className="absolute inset-0 bg-primary translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+            <span className="relative font-mono text-xs sm:text-sm tracking-[0.35em] uppercase text-black group-hover:text-white transition-colors duration-300 font-bold">
               {t('hero.cta')}
             </span>
             <span className="relative flex items-center overflow-hidden w-5 h-4">
-              <svg className="absolute w-4 h-4 text-white group-hover:text-black translate-x-0 group-hover:translate-x-5 transition-all duration-300 ease-in"
+              <svg className="absolute w-4 h-4 text-black group-hover:text-white translate-x-0 group-hover:translate-x-5 transition-all duration-300 ease-in"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-              <svg className="absolute w-4 h-4 text-black -translate-x-5 group-hover:translate-x-0 transition-transform duration-300 ease-out"
+              <svg className="absolute w-4 h-4 text-white -translate-x-5 group-hover:translate-x-0 transition-transform duration-300 ease-out"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

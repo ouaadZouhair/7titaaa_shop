@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import AnimatedButton from '../components/AnimatedButton'
 
@@ -9,6 +10,7 @@ export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation()
   const from = location.state?.from?.pathname || '/'
   const [serverError, setServerError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -23,7 +25,7 @@ export default function Login() {
       const destination = user.role === 'admin' ? '/admin' : from
       navigate(destination, { replace: true })
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Login failed')
+      setServerError(err.response?.data?.message || t('login.failed'))
     } finally {
       setSubmitting(false)
     }
@@ -41,7 +43,7 @@ export default function Login() {
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-4"
           >
-            Welcome Back
+            {t('login.welcomeBack')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
@@ -49,7 +51,7 @@ export default function Login() {
             transition={{ delay: 0.1 }}
             className="font-display text-7xl md:text-8xl text-white tracking-wide"
           >
-            LOG IN
+            {t('login.title')}
           </motion.h1>
         </div>
       </section>
@@ -72,13 +74,13 @@ export default function Login() {
 
           <div>
             <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-              Email
+              {t('login.email')}
             </label>
             <input
               type="email"
               {...register('email', {
-                required: 'Required',
-                pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email' },
+                required: t('login.required'),
+                pattern: { value: /\S+@\S+\.\S+/, message: t('login.invalidEmail') },
               })}
               placeholder="you@7titaaa.com"
               className={inputClass}
@@ -90,13 +92,13 @@ export default function Login() {
 
           <div>
             <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-              Password
+              {t('login.password')}
             </label>
             <input
               type="password"
               {...register('password', {
-                required: 'Required',
-                minLength: { value: 6, message: 'At least 6 characters' },
+                required: t('login.required'),
+                minLength: { value: 6, message: t('login.min6') },
               })}
               placeholder="••••••••"
               className={inputClass}
@@ -108,14 +110,14 @@ export default function Login() {
 
           <div className="pt-2">
             <AnimatedButton type="submit" disabled={submitting} fullWidth>
-              {submitting ? 'Logging in…' : 'Log In'}
+              {submitting ? t('login.loggingIn') : t('login.logIn')}
             </AnimatedButton>
           </div>
 
           <p className="text-center text-sm text-gray-500 pt-4">
-            No account?{' '}
+            {t('login.noAccount')}{' '}
             <Link to="/register" className="text-street-black font-semibold hover:text-primary transition-colors">
-              Sign up
+              {t('login.signUp')}
             </Link>
           </p>
         </motion.form>

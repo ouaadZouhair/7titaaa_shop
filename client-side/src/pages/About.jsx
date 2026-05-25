@@ -1,6 +1,7 @@
 import { motion, useInView } from 'motion/react'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import AnimatedButton from '../components/AnimatedButton'
 import vintageStore from '../assets/photos/vintage_store.jpg'
 
@@ -21,24 +22,13 @@ function Reveal({ children, delay = 0, className = '' }) {
 }
 
 const values = [
-  {
-    icon: '🔥',
-    title: 'Authenticity',
-    desc: 'Every drop is rooted in real street culture, not trend-chasing. We stay true to the art.',
-  },
-  {
-    icon: '✊',
-    title: 'Community',
-    desc: 'Built for the people who live the lifestyle — creators, artists, and anyone who moves different.',
-  },
-  {
-    icon: '♻️',
-    title: 'Quality',
-    desc: 'Premium fabrics, proper construction. Gear that lasts longer than the season.',
-  },
+  { icon: '🔥', titleKey: 'about.values.authenticityTitle', descKey: 'about.values.authenticityDesc' },
+  { icon: '✊', titleKey: 'about.values.communityTitle', descKey: 'about.values.communityDesc' },
+  { icon: '♻️', titleKey: 'about.values.qualityTitle', descKey: 'about.values.qualityDesc' },
 ]
 
 export default function About() {
+  const { t } = useTranslation()
   return (
     <div>
       {/* Hero */}
@@ -55,7 +45,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-5"
           >
-            Who We Are
+            {t('about.whoWeAre')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -63,9 +53,9 @@ export default function About() {
             transition={{ delay: 0.1, duration: 0.7 }}
             className="font-display text-7xl md:text-9xl text-white tracking-wide leading-none mb-8"
           >
-            THE
+            {t('about.the')}
             <br />
-            <span className="gradient-text">STORY</span>
+            <span className="gradient-text">{t('about.story')}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -73,7 +63,7 @@ export default function About() {
             transition={{ delay: 0.3 }}
             className="text-white/50 text-lg max-w-xl leading-relaxed"
           >
-            7titaaa was born on the corner of creativity and culture. What started as a local hustle turned into a movement that spans continents.
+            {t('about.intro')}
           </motion.p>
         </div>
       </section>
@@ -82,20 +72,20 @@ export default function About() {
       <section className="py-20 bg-gray-50 px-6">
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-14">
-            <p className="font-mono text-[11px] tracking-[0.5em] text-primary uppercase mb-3">What We Stand For</p>
-            <h2 className="font-display text-5xl text-street-black tracking-wide">OUR VALUES</h2>
+            <p className="font-mono text-[11px] tracking-[0.5em] text-primary uppercase mb-3">{t('about.whatWeStandFor')}</p>
+            <h2 className="font-display text-5xl text-street-black tracking-wide">{t('about.ourValues')}</h2>
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {values.map((v, i) => (
-              <Reveal key={v.title} delay={i * 0.1}>
+              <Reveal key={v.titleKey} delay={i * 0.1}>
                 <motion.div
                   whileHover={{ y: -4 }}
                   className="bg-white p-8 rounded-sm border border-gray-100 hover:shadow-lg hover:shadow-black/5 transition-shadow"
                 >
                   <span className="text-4xl mb-4 block">{v.icon}</span>
-                  <h3 className="font-display text-2xl text-street-black tracking-wide mb-3">{v.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{v.desc}</p>
+                  <h3 className="font-display text-2xl text-street-black tracking-wide mb-3">{t(v.titleKey)}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{t(v.descKey)}</p>
                 </motion.div>
               </Reveal>
             ))}
@@ -108,10 +98,10 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { n: '2023', label: 'Founded' },
-              { n: '10K+', label: 'Customers' },
-              { n: '200+', label: 'Pieces' },
-              { n: '15+', label: 'Countries' },
+              { n: '2023', label: t('about.stats.founded') },
+              { n: '10K+', label: t('about.stats.customers') },
+              { n: '200+', label: t('about.stats.pieces') },
+              { n: '15+', label: t('about.stats.countries') },
             ].map(({ n, label }, i) => (
               <Reveal key={label} delay={i * 0.1} className="text-center">
                 <p className="font-display text-5xl md:text-6xl text-white mb-2">{n}</p>
@@ -126,14 +116,14 @@ export default function About() {
       <section className="py-20 px-6 text-center">
         <Reveal>
           <h2 className="font-display text-5xl text-street-black tracking-wide mb-4">
-            READY TO WEAR THE CULTURE?
+            {t('about.readyToWear')}
           </h2>
           <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto">
-            Explore the latest drops and find your piece of the movement.
+            {t('about.exploreDrops')}
           </p>
           <Link to="/shop">
             <AnimatedButton variant="gradient" className="mx-auto px-12 py-4">
-              Shop Now
+              {t('about.shopNow')}
             </AnimatedButton>
           </Link>
         </Reveal>

@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { useProduct, useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 import ProductCard from '../components/ProductCard'
 import AnimatedButton from '../components/AnimatedButton'
 import { resolveImageUrl } from '../lib/uploads'
+import { qualityBadgeColor } from '../lib/quality'
 
 export default function ProductDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { t } = useTranslation()
 
   const { product, loading } = useProduct(id)
   const { items: relatedAll } = useProducts({
@@ -33,7 +36,7 @@ export default function ProductDetails() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">Loading…</p>
+        <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400">{t('common.loading')}</p>
       </div>
     )
   }
@@ -41,8 +44,8 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="font-display text-5xl text-gray-200">PRODUCT NOT FOUND</p>
-        <Link to="/shop" className="text-primary underline text-sm">Back to Shop</Link>
+        <p className="font-display text-5xl text-gray-200">{t('product.notFound')}</p>
+        <Link to="/shop" className="text-primary underline text-sm">{t('product.backToShop')}</Link>
       </div>
     )
   }
@@ -66,9 +69,9 @@ export default function ProductDetails() {
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-6 pt-8 pb-2">
         <nav className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-gray-400">
-          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+          <Link to="/" className="hover:text-primary transition-colors">{t('nav.home')}</Link>
           <span>/</span>
-          <Link to="/shop" className="hover:text-primary transition-colors">Shop</Link>
+          <Link to="/shop" className="hover:text-primary transition-colors">{t('nav.shop')}</Link>
           <span>/</span>
           <span className="text-street-black">{product.name}</span>
         </nav>
@@ -126,24 +129,24 @@ export default function ProductDetails() {
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16zm-3-8h6m-3-3v6" />
               </svg>
-              Hover to zoom
+              {t('product.hoverToZoom')}
             </div>
 
             {/* Badges */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
+            <div className="absolute top-4 left-4 flex flex-col items-start gap-1.5">
               {!isAvailable ? (
-                <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
-                  Sold Out
+                <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
+                  {t('product.soldOut')}
                 </span>
               ) : (
                 <>
-                  {product.isNew && (
-                    <span className="bg-primary text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
-                      NEW
+                  {product.quality != null && (
+                    <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
+                      {t(`product.qualityTiers.${product.quality}`)}
                     </span>
                   )}
                   {discount && (
-                    <span className="bg-accent-red text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
+                    <span className="bg-green-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
                       -{discount}%
                     </span>
                   )}
@@ -168,7 +171,7 @@ export default function ProductDetails() {
 
           {/* Quality */}
           <div className="flex items-center gap-2 mb-6">
-            <span className="font-mono text-[10px] tracking-widest uppercase text-gray-400">Quality</span>
+            <span className="font-mono text-[10px] tracking-widest uppercase text-gray-400">{t('product.quality')}</span>
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
@@ -197,21 +200,21 @@ export default function ProductDetails() {
           {/* Size, Type & Quantity */}
           <div className="flex gap-6 mb-8">
             <div>
-              <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Size</p>
+              <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">{t('product.size')}</p>
               <span className="inline-block px-4 py-2 border border-gray-200 rounded-sm font-mono text-xs text-street-black bg-gray-50">
                 {defaultSize}
               </span>
             </div>
             {product.type && (
               <div>
-                <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Type</p>
+                <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">{t('product.type')}</p>
                 <span className="inline-block px-4 py-2 border border-gray-200 rounded-sm font-mono text-xs text-street-black bg-gray-50">
                   {product.type}
                 </span>
               </div>
             )}
             <div>
-              <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Quantity</p>
+              <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">{t('product.quantity')}</p>
               <span className="inline-block px-4 py-2 border border-gray-200 rounded-sm font-mono text-xs text-street-black bg-gray-50">
                 1
               </span>
@@ -222,7 +225,7 @@ export default function ProductDetails() {
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
             {!isAvailable ? (
               <div className="w-full py-4 text-center font-mono text-sm tracking-widest uppercase bg-gray-100 text-gray-400 rounded-sm cursor-not-allowed select-none">
-                Sold Out
+                {t('product.soldOut')}
               </div>
             ) : (
               <>
@@ -232,7 +235,7 @@ export default function ProductDetails() {
                   fullWidth
                   className="py-4"
                 >
-                  {added ? '✓ Added to Cart!' : 'Add to Cart'}
+                  {added ? t('product.addedToCart') : t('product.addToCart')}
                 </AnimatedButton>
                 <AnimatedButton
                   variant="gradient"
@@ -240,7 +243,7 @@ export default function ProductDetails() {
                   fullWidth
                   className="py-4"
                 >
-                  Buy Now
+                  {t('product.buyNow')}
                 </AnimatedButton>
               </>
             )}
@@ -249,9 +252,9 @@ export default function ProductDetails() {
           {/* Meta */}
           <div className="border-t border-gray-100 pt-6 space-y-2">
             {[
-              { label: 'Category', value: product.category },
-              { label: 'Type', value: product.type },
-              { label: 'Tags', value: (product.tags || []).join(', ') },
+              { label: t('product.category'), value: product.category },
+              { label: t('product.type'), value: product.type },
+              { label: t('product.tags'), value: (product.tags || []).join(', ') },
             ]
               .filter((m) => m.value)
               .map(({ label, value }) => (
@@ -271,8 +274,8 @@ export default function ProductDetails() {
         <section className="py-16 px-6 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="mb-8">
-              <p className="font-mono text-[10px] tracking-[0.5em] text-primary uppercase mb-2">You May Also Like</p>
-              <h2 className="font-display text-4xl text-street-black tracking-wide">RELATED PIECES</h2>
+              <p className="font-mono text-[10px] tracking-[0.5em] text-primary uppercase mb-2">{t('product.youMayAlsoLike')}</p>
+              <h2 className="font-display text-4xl text-street-black tracking-wide">{t('product.relatedPieces')}</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map((p, i) => (

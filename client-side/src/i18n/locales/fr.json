@@ -3,44 +3,237 @@
     "home": "Accueil",
     "shop": "Boutique",
     "about": "À propos",
-    "contact": "Contact"
+    "contact": "Contact",
+    "cart": "Panier"
+  },
+  "common": {
+    "shopNow": "Acheter",
+    "viewAll": "Voir tout",
+    "loading": "Chargement…",
+    "search": "Rechercher produits, tags...",
+    "clear": "Effacer"
   },
   "hero": {
     "cta": "Acheter"
   },
   "home": {
+    "whoWeAre": "Qui sommes-nous",
+    "theStory": "L'HISTOIRE",
+    "storyP1": "7tita est une marque marocaine qui a explosé en 2023, et on est tout simplement obsédés par la culture street : skateboard, hip-hop, breakdance, tout ce qui est bon.",
+    "storyP2": "On a donc commencé à vendre des vêtements vintage d'occasion parce que, honnêtement, c'est là qu'est le vrai style. En gros, tout ce qui respire l'esthétique street authentique.",
+    "storyP3": "Tout est question de mettre la main sur de véritables pièces vintage qui ont une histoire et un caractère réels. C'est bien plus intéressant que du neuf, et c'est aussi plus doux pour le portefeuille. Si tu veux construire ce vrai look streetwear, on s'occupe de toi.",
     "browseBy": "Parcourir par",
     "categories": "CATÉGORIES",
     "limitedEdition": "Édition Limitée",
-    "dropSeason": "SAISON DROP",
+    "dropSeason": "SAISON",
+    "dropSeasonAccent": "DROP",
     "dropDesc": "Des pièces exclusives qui partent vite. Inscrivez-vous pour accéder en premier à chaque drop.",
     "seeAllDrops": "Voir tous les Drops",
     "justLanded": "Vient d'arriver",
     "newDrops": "NOUVEAUTÉS",
     "viewAll": "Voir tout",
-    "joinMovement": "REJOINS LE MOUVEMENT",
-    "freeShipping": "Livraison gratuite dès 100$",
-    "shopCollection": "Voir la Collection"
+    "joinCulture": "REJOINS LA CULTURE",
+    "followInstagram": "Suis-nous sur Instagram",
+    "followOnInstagram": "Suivre sur Instagram"
+  },
+  "category": {
+    "items": "{{count}} articles"
   },
   "product": {
     "addToCart": "Ajouter au Panier",
     "added": "✓ Ajouté",
+    "addedToCart": "✓ Ajouté au Panier !",
     "buyNow": "Acheter",
     "new": "NOUVEAU",
+    "soldOut": "Épuisé",
     "selectSize": "Choisir la Taille",
     "quantity": "Quantité",
-    "description": "Description"
+    "description": "Description",
+    "quality": "Qualité",
+    "qualityTiers": {
+      "1": "Bronze",
+      "2": "Argent",
+      "3": "Or",
+      "4": "Platine",
+      "5": "Diamant"
+    },
+    "size": "Taille",
+    "type": "Type",
+    "category": "Catégorie",
+    "tags": "Tags",
+    "hoverToZoom": "Survoler pour zoomer",
+    "notFound": "PRODUIT INTROUVABLE",
+    "backToShop": "Retour à la Boutique",
+    "youMayAlsoLike": "Vous aimerez aussi",
+    "relatedPieces": "PIÈCES SIMILAIRES"
+  },
+  "shop": {
+    "browse": "Parcourir",
+    "title": "LA BOUTIQUE",
+    "resultsFor": "Résultats pour",
+    "clearSearch": "Effacer la recherche",
+    "filters": "Filtres",
+    "priceRange": "Fourchette de Prix",
+    "minQuality": "Qualité Min.",
+    "clear": "Effacer",
+    "noItems": "AUCUN ARTICLE TROUVÉ",
+    "tryAdjusting": "Essayez d'ajuster vos filtres.",
+    "sort": {
+      "newest": "Plus récents",
+      "priceAsc": "Prix : croissant",
+      "priceDesc": "Prix : décroissant",
+      "rating": "Mieux notés"
+    },
+    "categories": {
+      "All": "Tout",
+      "Hoodies": "Hoodies",
+      "Sneakers": "Sneakers",
+      "Caps": "Casquettes",
+      "Tees": "T-shirts",
+      "Jackets": "Vestes",
+      "Bottoms": "Bas"
+    }
   },
   "checkout": {
-    "title": "Votre Panier",
-    "empty": "Votre panier est vide",
+    "title": "PAIEMENT",
+    "steps": {
+      "cart": "Panier",
+      "shipping": "Livraison",
+      "whatsapp": "WhatsApp"
+    },
+    "yourBag": "VOTRE PANIER",
+    "bagEmpty": "VOTRE PANIER EST VIDE",
+    "browseShop": "Voir la Boutique",
+    "proceedToShipping": "Passer à la Livraison →",
+    "sizeLabel": "Taille",
+    "backToCart": "← Retour au Panier",
+    "shippingInfo": "INFOS DE LIVRAISON",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "email": "Email",
+    "address": "Adresse",
+    "city": "Ville",
+    "selectCity": "— Choisissez votre ville —",
+    "reviewSend": "Vérifier & Envoyer via WhatsApp →",
+    "backToShipping": "← Retour à la Livraison",
+    "confirmOrder": "CONFIRMER LA COMMANDE",
+    "shippingTo": "Livraison à",
+    "items": "Articles",
+    "whatsappNote": "Cliquer ci-dessous ouvre WhatsApp avec tous les détails de votre commande",
+    "sendOrder": "Envoyer la Commande sur WhatsApp — {{total}} DH",
+    "saving": "Enregistrement…",
+    "orderSummary": "RÉCAPITULATIF",
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
     "total": "Total",
-    "placeOrder": "Passer la Commande"
-  },
-  "about": {
-    "title": "À propos de nous"
+    "orderSent": "COMMANDE ENVOYÉE",
+    "orderSentDesc": "Votre commande a été envoyée via WhatsApp. Nous la confirmerons et reviendrons vers vous très vite.",
+    "ref": "Réf #{{ref}}",
+    "continueShopping": "Continuer mes Achats"
   },
   "contact": {
-    "title": "Contactez-nous"
+    "getInTouch": "Contactez-nous",
+    "title": "ÉCRIS-NOUS",
+    "letsTalk": "PARLONS-EN",
+    "intro": "Questions sur ta commande, collabs, ou juste envie de parler culture street — glisse dans notre boîte de réception.",
+    "labels": {
+      "email": "Email",
+      "phone": "Téléphone",
+      "hours": "Horaires",
+      "location": "Adresse"
+    },
+    "hoursValue": "Lun–Ven, 9h–18h",
+    "locationValue": "Rabat — Maroc",
+    "followDrop": "SUIS LE DROP",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "subject": "Sujet",
+    "subjectOptions": {
+      "order": "Problème de commande",
+      "collab": "Collaboration",
+      "general": "Question générale",
+      "returns": "Retours & Remboursements"
+    },
+    "message": "Message",
+    "messagePlaceholder": "Quoi de neuf...",
+    "required": "Requis",
+    "invalidEmail": "Email invalide",
+    "tooShort": "Trop court",
+    "send": "Envoyer le Message",
+    "sending": "Envoi…",
+    "messageSent": "MESSAGE ENVOYÉ !",
+    "messageSentDesc": "Nous reviendrons vers vous sous 24 heures."
+  },
+  "about": {
+    "whoWeAre": "Qui sommes-nous",
+    "the": "L'",
+    "story": "HISTOIRE",
+    "intro": "7titaaa est née au croisement de la créativité et de la culture. Ce qui a commencé comme un projet local est devenu un mouvement qui traverse les continents.",
+    "whatWeStandFor": "Nos Valeurs",
+    "ourValues": "NOS VALEURS",
+    "values": {
+      "authenticityTitle": "Authenticité",
+      "authenticityDesc": "Chaque drop est ancré dans la vraie culture street, pas dans la course aux tendances. On reste fidèles à l'art.",
+      "communityTitle": "Communauté",
+      "communityDesc": "Conçu pour ceux qui vivent ce mode de vie — créateurs, artistes, et tous ceux qui bougent différemment.",
+      "qualityTitle": "Qualité",
+      "qualityDesc": "Tissus premium, fabrication soignée. Des pièces qui durent plus longtemps qu'une saison."
+    },
+    "stats": {
+      "founded": "Fondée",
+      "customers": "Clients",
+      "pieces": "Pièces",
+      "countries": "Pays"
+    },
+    "readyToWear": "PRÊT À PORTER LA CULTURE ?",
+    "exploreDrops": "Découvre les derniers drops et trouve ta pièce du mouvement.",
+    "shopNow": "Acheter"
+  },
+  "login": {
+    "welcomeBack": "Bon Retour",
+    "title": "CONNEXION",
+    "email": "Email",
+    "password": "Mot de passe",
+    "required": "Requis",
+    "invalidEmail": "Email invalide",
+    "min6": "Au moins 6 caractères",
+    "logIn": "Se Connecter",
+    "loggingIn": "Connexion…",
+    "noAccount": "Pas de compte ?",
+    "signUp": "S'inscrire",
+    "failed": "Échec de la connexion"
+  },
+  "register": {
+    "joinCrew": "Rejoins l'Équipe",
+    "title": "INSCRIPTION",
+    "name": "Nom",
+    "email": "Email",
+    "password": "Mot de passe",
+    "required": "Requis",
+    "tooShort": "Trop court",
+    "invalidEmail": "Email invalide",
+    "min6": "Au moins 6 caractères",
+    "signUp": "S'inscrire",
+    "creatingAccount": "Création du compte…",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "logIn": "Se connecter",
+    "failed": "Échec de l'inscription"
+  },
+  "footer": {
+    "tagline": "Streetwear premium ancré dans la culture hip-hop. Porté par les créateurs, conçu pour la rue.",
+    "shop": "Boutique",
+    "company": "Entreprise",
+    "newDrops": "Nouveautés",
+    "links": {
+      "about": "À propos",
+      "contact": "Contact",
+      "shippingInfo": "Infos Livraison",
+      "returns": "Retours",
+      "privacy": "Confidentialité"
+    },
+    "rights": "© {{year}} 7titaaa Shop. Tous droits réservés.",
+    "createdBy": "Créé par ZouhairOD"
   }
 }

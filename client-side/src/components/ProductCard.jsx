@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useCart } from '../context/CartContext'
 import { useTranslation } from 'react-i18next'
 import { resolveImageUrl } from '../lib/uploads'
+import { qualityBadgeColor } from '../lib/quality'
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart()
@@ -55,18 +56,18 @@ export default function ProductCard({ product }) {
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
             {!isAvailable ? (
-              <span className="bg-gray-700 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
-                Sold out
+              <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
+                {t('product.soldOut')}
               </span>
             ) : (
               <>
-                {product.isNew && (
-                  <span className="bg-red-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
-                    {t('product.new')}
+                {product.quality != null && (
+                  <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
+                    {t(`product.qualityTiers.${product.quality}`)}
                   </span>
                 )}
                 {discount && (
-                  <span className="bg-green-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
+                  <span className="bg-green-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
                     -{discount}%
                   </span>
                 )}

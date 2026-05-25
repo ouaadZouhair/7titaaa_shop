@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useCart } from '../context/CartContext'
 import AnimatedButton from '../components/AnimatedButton'
 import api from '../lib/api'
@@ -19,6 +20,7 @@ const MOROCCO_CITIES = [
 
 export default function Checkout() {
   const { cartItems, removeFromCart, cartTotal, cartCount, clearCart } = useCart()
+  const { t } = useTranslation()
   const [step, setStep] = useState('cart') // 'cart' | 'shipping' | 'whatsapp' | 'confirmed'
   const [shippingData, setShippingData] = useState(null)
   const [orderRef, setOrderRef] = useState('')
@@ -65,7 +67,7 @@ export default function Checkout() {
     }
 
     const itemLines = cartItems.map(item =>
-      `• ${item.name} (${item.size}) — {item.price.toFixed(2)} DH DH\n  🖼️ ${item.image}`
+      `• ${item.name} (${item.size}) — ${item.price.toFixed(2)} DH\n  🖼️ ${item.image}`
     ).join('\n\n')
 
     const message = [
@@ -109,15 +111,15 @@ export default function Checkout() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="font-display text-5xl text-street-black tracking-wide mb-4">ORDER SENT</h2>
+          <h2 className="font-display text-5xl text-street-black tracking-wide mb-4">{t('checkout.orderSent')}</h2>
           <p className="text-gray-500 text-sm leading-relaxed mb-2">
-            Your order was sent via WhatsApp. We'll confirm it and get back to you shortly.
+            {t('checkout.orderSentDesc')}
           </p>
           <p className="font-mono text-[10px] text-gray-400 tracking-widest uppercase mb-8">
-            Ref #{orderRef}
+            {t('checkout.ref', { ref: orderRef })}
           </p>
           <AnimatedButton variant="dark" onClick={() => navigate('/shop')} className="mx-auto">
-            Continue Shopping
+            {t('checkout.continueShopping')}
           </AnimatedButton>
         </motion.div>
       </div>
@@ -129,18 +131,17 @@ export default function Checkout() {
       {/* Header */}
       <div className="bg-street-black py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="font-display text-5xl text-white tracking-wide">CHECKOUT</h1>
+          <h1 className="font-display text-5xl text-white tracking-wide">{t('checkout.title')}</h1>
           <div className="flex items-center gap-3 mt-4">
-            {['Cart', 'Shipping', 'WhatsApp'].map((s, i) => {
-              const stepKey = ['cart', 'shipping', 'whatsapp'][i]
+            {['cart', 'shipping', 'whatsapp'].map((stepKey, i) => {
               const isActive = step === stepKey
               const isDone = ['cart', 'shipping', 'whatsapp'].indexOf(step) > i
               return (
-                <div key={s} className="flex items-center gap-3">
+                <div key={stepKey} className="flex items-center gap-3">
                   <span className={`font-mono text-[10px] tracking-widest uppercase ${
                     isActive ? 'text-primary-light' : isDone ? 'text-white/40 line-through' : 'text-white/20'
                   }`}>
-                    {s}
+                    {t(`checkout.steps.${stepKey}`)}
                   </span>
                   {i < 2 && <span className="text-white/20">→</span>}
                 </div>
@@ -165,14 +166,14 @@ export default function Checkout() {
                 transition={{ duration: 0.3 }}
               >
                 <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">
-                  YOUR BAG ({cartCount})
+                  {t('checkout.yourBag')} ({cartCount})
                 </h2>
 
                 {cartItems.length === 0 ? (
                   <div className="bg-white rounded-sm p-12 text-center">
-                    <p className="font-display text-4xl text-gray-200 mb-3">YOUR BAG IS EMPTY</p>
+                    <p className="font-display text-4xl text-gray-200 mb-3">{t('checkout.bagEmpty')}</p>
                     <Link to="/shop">
-                      <AnimatedButton variant="dark" className="mt-4 mx-auto">Browse Shop</AnimatedButton>
+                      <AnimatedButton variant="dark" className="mt-4 mx-auto">{t('checkout.browseShop')}</AnimatedButton>
                     </Link>
                   </div>
                 ) : (
@@ -201,7 +202,7 @@ export default function Checkout() {
                               </p>
                               <h3 className="font-semibold text-sm text-street-black leading-tight">{item.name}</h3>
                               <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">
-                                Size: {item.size}{item.type ? ` · ${item.type}` : ''}
+                                {t('checkout.sizeLabel')}: {item.size}{item.type ? ` · ${item.type}` : ''}
                               </p>
                             </div>
                             <button
@@ -228,7 +229,7 @@ export default function Checkout() {
                         className="py-4"
                         disabled={cartItems.length === 0}
                       >
-                        Proceed to Shipping →
+                        {t('checkout.proceedToShipping')}
                       </AnimatedButton>
                     </div>
                   </div>
@@ -249,23 +250,23 @@ export default function Checkout() {
                   onClick={() => setStep('cart')}
                   className="flex items-center gap-2 text-gray-400 hover:text-street-black font-mono text-[11px] tracking-widest uppercase mb-6 transition-colors"
                 >
-                  ← Back to Cart
+                  {t('checkout.backToCart')}
                 </button>
-                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">SHIPPING INFO</h2>
+                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">{t('checkout.shippingInfo')}</h2>
 
                 <form onSubmit={handleSubmit(handleShipping)} className="space-y-5">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">First Name</label>
+                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.firstName')}</label>
                       <input {...register('firstName', { required: true })} placeholder="Yassine" className={inputClass} />
                     </div>
                     <div>
-                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Last Name</label>
+                      <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.lastName')}</label>
                       <input {...register('lastName', { required: true })} placeholder="Alami" className={inputClass} />
                     </div>
                   </div>
                   <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Phone</label>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.phone')}</label>
                     <input
                       {...register('phone', { required: true })}
                       type="tel"
@@ -274,24 +275,24 @@ export default function Checkout() {
                     />
                   </div>
                   <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Email</label>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.email')}</label>
                     <input {...register('email', { required: true })} type="email" placeholder="you@example.com" className={inputClass} />
                   </div>
                   <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">Address</label>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.address')}</label>
                     <input {...register('address', { required: true })} placeholder="123 Rue Mohammed V" className={inputClass} />
                   </div>
                   <div>
-                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">City</label>
+                    <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">{t('checkout.city')}</label>
                     <select {...register('city', { required: true })} className={inputClass}>
-                      <option value="">— Select your city —</option>
+                      <option value="">{t('checkout.selectCity')}</option>
                       {MOROCCO_CITIES.map(city => (
                         <option key={city} value={city}>{city}</option>
                       ))}
                     </select>
                   </div>
                   <AnimatedButton type="submit" variant="dark" fullWidth className="py-4 mt-2">
-                    Review & Send via WhatsApp →
+                    {t('checkout.reviewSend')}
                   </AnimatedButton>
                 </form>
               </motion.div>
@@ -310,13 +311,13 @@ export default function Checkout() {
                   onClick={() => setStep('shipping')}
                   className="flex items-center gap-2 text-gray-400 hover:text-street-black font-mono text-[11px] tracking-widest uppercase mb-6 transition-colors"
                 >
-                  ← Back to Shipping
+                  {t('checkout.backToShipping')}
                 </button>
-                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">CONFIRM ORDER</h2>
+                <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">{t('checkout.confirmOrder')}</h2>
 
                 {shippingData && (
                   <div className="bg-white rounded-sm p-5 mb-4">
-                    <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">Shipping to</p>
+                    <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">{t('checkout.shippingTo')}</p>
                     <p className="text-sm font-semibold text-street-black">{shippingData.firstName} {shippingData.lastName}</p>
                     <p className="text-sm text-gray-500">{shippingData.phone}</p>
                     <p className="text-sm text-gray-500">{shippingData.email}</p>
@@ -325,7 +326,7 @@ export default function Checkout() {
                 )}
 
                 <div className="bg-white rounded-sm p-5 mb-4 space-y-4">
-                  <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase">Items ({cartCount})</p>
+                  <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase">{t('checkout.items')} ({cartCount})</p>
                   {cartItems.map(item => (
                     <div key={`${item.id}-${item.size}`} className="flex gap-4 items-center">
                       <img src={resolveImageUrl(item.image)} alt={item.name} className="w-16 h-20 object-cover rounded-sm shrink-0" />
@@ -346,7 +347,7 @@ export default function Checkout() {
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.122 1.523 5.854L.057 23.886a.5.5 0 00.606.63l6.257-1.641A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.876 9.876 0 01-5.031-1.373l-.36-.214-3.733.979 1.003-3.628-.235-.374A9.86 9.86 0 012.1 12C2.1 6.533 6.533 2.1 12 2.1S21.9 6.533 21.9 12 17.467 21.9 12 21.9z"/>
                   </svg>
                   <p className="font-mono text-[10px] tracking-widest text-green-700 uppercase">
-                    Clicking below opens WhatsApp with your full order details
+                    {t('checkout.whatsappNote')}
                   </p>
                 </div>
 
@@ -357,7 +358,7 @@ export default function Checkout() {
                   className="py-4 text-base"
                   disabled={sending}
                 >
-                  {sending ? 'Saving…' : `Send Order on WhatsApp — ${total.toFixed(2)} DH`}
+                  {sending ? t('checkout.saving') : t('checkout.sendOrder', { total: total.toFixed(2) })}
                 </AnimatedButton>
               </motion.div>
             )}
@@ -367,7 +368,7 @@ export default function Checkout() {
         {/* ORDER SUMMARY */}
         <div>
           <div className="bg-white rounded-sm p-6 sticky top-24">
-            <h3 className="font-display text-2xl text-street-black tracking-wide mb-5">ORDER SUMMARY</h3>
+            <h3 className="font-display text-2xl text-street-black tracking-wide mb-5">{t('checkout.orderSummary')}</h3>
 
             <div className="space-y-3 mb-5">
               {cartItems.map(item => (
@@ -386,8 +387,8 @@ export default function Checkout() {
 
             <div className="border-t border-gray-100 pt-4 space-y-2">
               {[
-                { label: 'Subtotal', value: `${cartTotal.toFixed(2)} DH` },
-                { label: 'Shipping', value: `${shipping.toFixed(2)} DH` },
+                { label: t('checkout.subtotal'), value: `${cartTotal.toFixed(2)} DH` },
+                { label: t('checkout.shipping'), value: `${shipping.toFixed(2)} DH` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="text-gray-500">{label}</span>
@@ -397,7 +398,7 @@ export default function Checkout() {
                 </div>
               ))}
               <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
-                <span className="font-semibold text-street-black">Total</span>
+                <span className="font-semibold text-street-black">{t('checkout.total')}</span>
                 <span className="font-display text-2xl text-street-black">{total.toFixed(2)} DH</span>
               </div>
             </div>

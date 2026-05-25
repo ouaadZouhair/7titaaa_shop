@@ -117,7 +117,7 @@ export default function Navbar() {
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Search products, tags..."
+                  placeholder={t('common.search')}
                   className="w-52 bg-white/10 text-white placeholder-white/30 font-mono text-[11px] tracking-wider px-3 py-1.5 rounded-sm border border-white/20 outline-none focus:border-white/50 transition-all"
                 />
                 <button

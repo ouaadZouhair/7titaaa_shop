@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import AnimatedButton from '../components/AnimatedButton'
 import api from '../lib/api'
 
@@ -11,7 +12,7 @@ const contactInfo = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
-    label: 'Email',
+    labelKey: 'contact.labels.email',
     value: 'support@7titaaa.com',
     href: 'mailto:support@7titaaa.com',
   },
@@ -21,7 +22,7 @@ const contactInfo = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
       </svg>
     ),
-    label: 'Phone',
+    labelKey: 'contact.labels.phone',
     value: '+212 6XX-XXXXXX',
     href: 'tel:+2126XXXXXXXX',
   },
@@ -31,8 +32,8 @@ const contactInfo = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    label: 'Hours',
-    value: 'Mon–Fri, 9AM–6PM',
+    labelKey: 'contact.labels.hours',
+    valueKey: 'contact.hoursValue',
     href: null,
   },
   {
@@ -42,13 +43,14 @@ const contactInfo = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
-    label: 'Location',
-    value: 'Rabat — Morocco',
+    labelKey: 'contact.labels.location',
+    valueKey: 'contact.locationValue',
     href: null,
   },
 ]
 
 export default function Contact() {
+  const { t } = useTranslation()
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const { register, handleSubmit, formState: { errors }, reset } = useForm()
@@ -86,7 +88,7 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-4"
           >
-            Get in Touch
+            {t('contact.getInTouch')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
@@ -94,7 +96,7 @@ export default function Contact() {
             transition={{ delay: 0.1 }}
             className="font-display text-7xl md:text-8xl text-white tracking-wide"
           >
-            HIT US UP
+            {t('contact.title')}
           </motion.h1>
         </div>
       </section>
@@ -109,26 +111,26 @@ export default function Contact() {
         >
           <div>
             <h2 className="font-display text-3xl text-street-black tracking-wide mb-6">
-              LET'S TALK
+              {t('contact.letsTalk')}
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-8">
-              Questions about your order, collabs, or just want to talk street culture — slide into our inbox.
+              {t('contact.intro')}
             </p>
 
             <div className="space-y-5">
               {contactInfo.map(item => (
-                <div key={item.label} className="flex items-start gap-4">
+                <div key={item.labelKey} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center text-primary shrink-0">
                     {item.icon}
                   </div>
                   <div>
-                    <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-0.5">{item.label}</p>
+                    <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-0.5">{t(item.labelKey)}</p>
                     {item.href ? (
                       <a href={item.href} className="text-street-black text-sm font-medium hover:text-primary transition-colors">
                         {item.value}
                       </a>
                     ) : (
-                      <p className="text-street-black text-sm font-medium">{item.value}</p>
+                      <p className="text-street-black text-sm font-medium">{item.valueKey ? t(item.valueKey) : item.value}</p>
                     )}
                   </div>
                 </div>
@@ -138,7 +140,7 @@ export default function Contact() {
 
 {/* Decorative */}
           <div className="p-6 bg-street-black rounded-sm">
-            <p className="font-display text-2xl text-white tracking-wide mb-2">FOLLOW THE DROP</p>
+            <p className="font-display text-2xl text-white tracking-wide mb-2">{t('contact.followDrop')}</p>
             <p className="font-mono text-[10px] text-white/40 tracking-widest uppercase">
               @7titaaa — Instagram / TikTok
             </p>
@@ -163,18 +165,18 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="font-display text-3xl text-street-black tracking-wide mb-2">MESSAGE SENT!</h3>
-              <p className="text-gray-400 text-sm">We'll get back to you within 24 hours.</p>
+              <h3 className="font-display text-3xl text-street-black tracking-wide mb-2">{t('contact.messageSent')}</h3>
+              <p className="text-gray-400 text-sm">{t('contact.messageSentDesc')}</p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-                    First Name
+                    {t('contact.firstName')}
                   </label>
                   <input
-                    {...register('firstName', { required: 'Required' })}
+                    {...register('firstName', { required: t('contact.required') })}
                     placeholder="Jordan"
                     className={inputClass}
                   />
@@ -184,10 +186,10 @@ export default function Contact() {
                 </div>
                 <div>
                   <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-                    Last Name
+                    {t('contact.lastName')}
                   </label>
                   <input
-                    {...register('lastName', { required: 'Required' })}
+                    {...register('lastName', { required: t('contact.required') })}
                     placeholder="Williams"
                     className={inputClass}
                   />
@@ -199,12 +201,12 @@ export default function Contact() {
 
               <div>
                 <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-                  Email
+                  {t('contact.email')}
                 </label>
                 <input
                   {...register('email', {
-                    required: 'Required',
-                    pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' },
+                    required: t('contact.required'),
+                    pattern: { value: /^\S+@\S+\.\S+$/, message: t('contact.invalidEmail') },
                   })}
                   type="email"
                   placeholder="you@example.com"
@@ -217,24 +219,24 @@ export default function Contact() {
 
               <div>
                 <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-                  Subject
+                  {t('contact.subject')}
                 </label>
                 <select {...register('subject')} className={inputClass}>
-                  <option value="order">Order Issue</option>
-                  <option value="collab">Collaboration</option>
-                  <option value="general">General Question</option>
-                  <option value="returns">Returns & Refunds</option>
+                  <option value="order">{t('contact.subjectOptions.order')}</option>
+                  <option value="collab">{t('contact.subjectOptions.collab')}</option>
+                  <option value="general">{t('contact.subjectOptions.general')}</option>
+                  <option value="returns">{t('contact.subjectOptions.returns')}</option>
                 </select>
               </div>
 
               <div>
                 <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-                  Message
+                  {t('contact.message')}
                 </label>
                 <textarea
-                  {...register('message', { required: 'Required', minLength: { value: 10, message: 'Too short' } })}
+                  {...register('message', { required: t('contact.required'), minLength: { value: 10, message: t('contact.tooShort') } })}
                   rows={6}
-                  placeholder="What's good..."
+                  placeholder={t('contact.messagePlaceholder')}
                   className={`${inputClass} resize-none`}
                 />
                 {errors.message && (
@@ -243,7 +245,7 @@ export default function Contact() {
               </div>
 
               <AnimatedButton type="submit" variant="dark" fullWidth className="py-4 mt-2" disabled={sending}>
-                {sending ? 'Sending…' : 'Send Message'}
+                {sending ? t('contact.sending') : t('contact.send')}
                 {!sending && (
                   <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

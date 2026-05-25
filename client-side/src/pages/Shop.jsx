@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { useProducts } from '../hooks/useProducts'
 import vintageStore from '../assets/photos/clothes.jpg'
 import ProductCard from '../components/ProductCard'
@@ -8,13 +9,14 @@ import SkeletonCard from '../components/SkeletonCard'
 
 const ALL_CATEGORIES = ['All', 'Hoodies', 'Sneakers', 'Caps', 'Tees', 'Jackets', 'Bottoms']
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'rating', label: 'Top Rated' },
+  { value: 'newest', labelKey: 'shop.sort.newest' },
+  { value: 'price-asc', labelKey: 'shop.sort.priceAsc' },
+  { value: 'price-desc', labelKey: 'shop.sort.priceDesc' },
+  { value: 'rating', labelKey: 'shop.sort.rating' },
 ]
 
 export default function Shop() {
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'All')
@@ -76,7 +78,7 @@ export default function Shop() {
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-3"
           >
-            Browse
+            {t('shop.browse')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -84,7 +86,7 @@ export default function Shop() {
             transition={{ delay: 0.1 }}
             className="font-display text-6xl md:text-7xl text-white tracking-wide"
           >
-            THE SHOP
+            {t('shop.title')}
           </motion.h1>
         </div>
       </div>
@@ -95,14 +97,14 @@ export default function Shop() {
         {searchQuery && (
           <div className="flex items-center gap-3 mb-6">
             <span className="font-mono text-xs tracking-widest text-gray-400 uppercase">
-              Results for
+              {t('shop.resultsFor')}
             </span>
             <span className="font-mono text-xs tracking-widest uppercase bg-street-black text-white px-3 py-1 rounded-sm">
               "{searchQuery}"
             </span>
             <button
               onClick={clearSearch}
-              aria-label="Clear search"
+              aria-label={t('shop.clearSearch')}
               className="text-gray-400 hover:text-gray-700 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -128,7 +130,7 @@ export default function Shop() {
                     : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                 }`}
               >
-                {cat}
+                {t(`shop.categories.${cat}`)}
               </motion.button>
             ))}
           </div>
@@ -141,7 +143,7 @@ export default function Shop() {
               className="appearance-none bg-gray-100 text-gray-700 text-xs font-mono tracking-wider px-4 py-2.5 rounded-sm cursor-pointer border-0 outline-none"
             >
               {SORT_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>{t(o.labelKey)}</option>
               ))}
             </select>
 
@@ -152,7 +154,7 @@ export default function Shop() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M10 12h4" />
               </svg>
-              Filters
+              {t('shop.filters')}
             </button>
           </div>
         </div>
@@ -171,7 +173,7 @@ export default function Shop() {
                 {/* Price range */}
                 <div>
                   <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
-                    Price Range
+                    {t('shop.priceRange')}
                   </p>
                   <div className="flex items-center gap-4">
                     <span className="font-mono text-sm text-gray-600">{priceRange[0]} DH</span>
@@ -191,7 +193,7 @@ export default function Shop() {
                 {/* Quality filter */}
                 <div>
                   <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
-                    Min. Quality
+                    {t('shop.minQuality')}
                   </p>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map(star => (
@@ -215,7 +217,7 @@ export default function Shop() {
                         onClick={() => setQualityFilter(0)}
                         className="ml-2 font-mono text-[10px] tracking-widest text-gray-400 hover:text-gray-700 uppercase transition-colors"
                       >
-                        Clear
+                        {t('shop.clear')}
                       </button>
                     )}
                   </div>
@@ -241,8 +243,8 @@ export default function Shop() {
                   animate={{ opacity: 1 }}
                   className="col-span-full py-20 text-center"
                 >
-                  <p className="font-display text-4xl text-gray-200 mb-3">NO ITEMS FOUND</p>
-                  <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
+                  <p className="font-display text-4xl text-gray-200 mb-3">{t('shop.noItems')}</p>
+                  <p className="text-gray-400 text-sm">{t('shop.tryAdjusting')}</p>
                 </motion.div>
               ) : (
                 filtered.map((product, i) => (

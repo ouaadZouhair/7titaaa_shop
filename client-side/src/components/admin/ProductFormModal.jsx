@@ -488,27 +488,6 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                 </span>
               </div>
             </div>
-
-            <div className="flex items-center gap-6 pt-1">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={!!form.isNew}
-                  onChange={(e) => update('isNew', e.target.checked)}
-                  className="w-4 h-4 accent-black"
-                />
-                <span className="text-sm">Mark as New</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={!!form.isFeatured}
-                  onChange={(e) => update('isFeatured', e.target.checked)}
-                  className="w-4 h-4 accent-black"
-                />
-                <span className="text-sm">Featured</span>
-              </label>
-            </div>
           </div>
 
           {/* Footer */}

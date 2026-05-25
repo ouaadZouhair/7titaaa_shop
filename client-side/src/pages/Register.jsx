@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import AnimatedButton from '../components/AnimatedButton'
 
 export default function Register() {
   const { register: registerUser } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [serverError, setServerError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -20,7 +22,7 @@ export default function Register() {
       await registerUser(data.name, data.email, data.password)
       navigate('/', { replace: true })
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Registration failed')
+      setServerError(err.response?.data?.message || t('register.failed'))
     } finally {
       setSubmitting(false)
     }
@@ -38,7 +40,7 @@ export default function Register() {
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-4"
           >
-            Join the Crew
+            {t('register.joinCrew')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
@@ -46,7 +48,7 @@ export default function Register() {
             transition={{ delay: 0.1 }}
             className="font-display text-7xl md:text-8xl text-white tracking-wide"
           >
-            SIGN UP
+            {t('register.title')}
           </motion.h1>
         </div>
       </section>
@@ -69,10 +71,10 @@ export default function Register() {
 
           <div>
             <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-              Name
+              {t('register.name')}
             </label>
             <input
-              {...register('name', { required: 'Required', minLength: { value: 2, message: 'Too short' } })}
+              {...register('name', { required: t('register.required'), minLength: { value: 2, message: t('register.tooShort') } })}
               placeholder="Jordan"
               className={inputClass}
             />
@@ -83,13 +85,13 @@ export default function Register() {
 
           <div>
             <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-              Email
+              {t('register.email')}
             </label>
             <input
               type="email"
               {...register('email', {
-                required: 'Required',
-                pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email' },
+                required: t('register.required'),
+                pattern: { value: /\S+@\S+\.\S+/, message: t('register.invalidEmail') },
               })}
               placeholder="you@7titaaa.com"
               className={inputClass}
@@ -101,13 +103,13 @@ export default function Register() {
 
           <div>
             <label className="font-mono text-[10px] tracking-widest uppercase text-gray-500 block mb-2">
-              Password
+              {t('register.password')}
             </label>
             <input
               type="password"
               {...register('password', {
-                required: 'Required',
-                minLength: { value: 6, message: 'At least 6 characters' },
+                required: t('register.required'),
+                minLength: { value: 6, message: t('register.min6') },
               })}
               placeholder="••••••••"
               className={inputClass}
@@ -119,14 +121,14 @@ export default function Register() {
 
           <div className="pt-2">
             <AnimatedButton type="submit" disabled={submitting} fullWidth>
-              {submitting ? 'Creating account…' : 'Sign Up'}
+              {submitting ? t('register.creatingAccount') : t('register.signUp')}
             </AnimatedButton>
           </div>
 
           <p className="text-center text-sm text-gray-500 pt-4">
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <Link to="/login" className="text-street-black font-semibold hover:text-primary transition-colors">
-              Log in
+              {t('register.logIn')}
             </Link>
           </p>
         </motion.form>

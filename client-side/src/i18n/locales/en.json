@@ -3,44 +3,237 @@
     "home": "Home",
     "shop": "Shop",
     "about": "About",
-    "contact": "Contact"
+    "contact": "Contact",
+    "cart": "Cart"
+  },
+  "common": {
+    "shopNow": "Shop Now",
+    "viewAll": "View All",
+    "loading": "Loading…",
+    "search": "Search products, tags...",
+    "clear": "Clear"
   },
   "hero": {
     "cta": "Shop Now"
   },
   "home": {
+    "whoWeAre": "Who We Are",
+    "theStory": "THE STORY",
+    "storyP1": "7tita is a Moroccan brand that popped off in 2023, and we're basically obsessed with street culture skateboarding, hip-hop, breakdancing, all that good stuff.",
+    "storyP2": "So we started selling second-hand vintage clothes because, honestly, that's where the real style is at. basically anything that screams authentic street aesthetic.",
+    "storyP3": "The whole thing is about getting your hands on genuine vintage pieces that have actual history and character. It's way more interesting than new stuff, and it's way easier on your wallet too. If you're trying to build that real streetwear vibe, we got you covered.",
     "browseBy": "Browse By",
     "categories": "CATEGORIES",
     "limitedEdition": "Limited Edition",
-    "dropSeason": "DROP SEASON",
+    "dropSeason": "DROP",
+    "dropSeasonAccent": "SEASON",
     "dropDesc": "Exclusive pieces that sell out fast. Sign up to get first access to every drop.",
     "seeAllDrops": "See All Drops",
     "justLanded": "Just Landed",
     "newDrops": "NEW DROPS",
     "viewAll": "View All",
-    "joinMovement": "JOIN THE MOVEMENT",
-    "freeShipping": "Free shipping on orders over $100",
-    "shopCollection": "Shop The Collection"
+    "joinCulture": "JOIN THE CULTURE",
+    "followInstagram": "Follow us on Instagram",
+    "followOnInstagram": "Follow on Instagram"
+  },
+  "category": {
+    "items": "{{count}} items"
   },
   "product": {
     "addToCart": "Add to Cart",
     "added": "✓ Added",
+    "addedToCart": "✓ Added to Cart!",
     "buyNow": "Buy Now",
     "new": "NEW",
+    "soldOut": "Sold Out",
     "selectSize": "Select Size",
     "quantity": "Quantity",
-    "description": "Description"
+    "description": "Description",
+    "quality": "Quality",
+    "qualityTiers": {
+      "1": "Bronze",
+      "2": "Silver",
+      "3": "Gold",
+      "4": "Platinum",
+      "5": "Diamond"
+    },
+    "size": "Size",
+    "type": "Type",
+    "category": "Category",
+    "tags": "Tags",
+    "hoverToZoom": "Hover to zoom",
+    "notFound": "PRODUCT NOT FOUND",
+    "backToShop": "Back to Shop",
+    "youMayAlsoLike": "You May Also Like",
+    "relatedPieces": "RELATED PIECES"
+  },
+  "shop": {
+    "browse": "Browse",
+    "title": "THE SHOP",
+    "resultsFor": "Results for",
+    "clearSearch": "Clear search",
+    "filters": "Filters",
+    "priceRange": "Price Range",
+    "minQuality": "Min. Quality",
+    "clear": "Clear",
+    "noItems": "NO ITEMS FOUND",
+    "tryAdjusting": "Try adjusting your filters.",
+    "sort": {
+      "newest": "Newest First",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "rating": "Top Rated"
+    },
+    "categories": {
+      "All": "All",
+      "Hoodies": "Hoodies",
+      "Sneakers": "Sneakers",
+      "Caps": "Caps",
+      "Tees": "Tees",
+      "Jackets": "Jackets",
+      "Bottoms": "Bottoms"
+    }
   },
   "checkout": {
-    "title": "Your Cart",
-    "empty": "Your cart is empty",
+    "title": "CHECKOUT",
+    "steps": {
+      "cart": "Cart",
+      "shipping": "Shipping",
+      "whatsapp": "WhatsApp"
+    },
+    "yourBag": "YOUR BAG",
+    "bagEmpty": "YOUR BAG IS EMPTY",
+    "browseShop": "Browse Shop",
+    "proceedToShipping": "Proceed to Shipping →",
+    "sizeLabel": "Size",
+    "backToCart": "← Back to Cart",
+    "shippingInfo": "SHIPPING INFO",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "city": "City",
+    "selectCity": "— Select your city —",
+    "reviewSend": "Review & Send via WhatsApp →",
+    "backToShipping": "← Back to Shipping",
+    "confirmOrder": "CONFIRM ORDER",
+    "shippingTo": "Shipping to",
+    "items": "Items",
+    "whatsappNote": "Clicking below opens WhatsApp with your full order details",
+    "sendOrder": "Send Order on WhatsApp — {{total}} DH",
+    "saving": "Saving…",
+    "orderSummary": "ORDER SUMMARY",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
     "total": "Total",
-    "placeOrder": "Place Order"
-  },
-  "about": {
-    "title": "About Us"
+    "orderSent": "ORDER SENT",
+    "orderSentDesc": "Your order was sent via WhatsApp. We'll confirm it and get back to you shortly.",
+    "ref": "Ref #{{ref}}",
+    "continueShopping": "Continue Shopping"
   },
   "contact": {
-    "title": "Contact Us"
+    "getInTouch": "Get in Touch",
+    "title": "HIT US UP",
+    "letsTalk": "LET'S TALK",
+    "intro": "Questions about your order, collabs, or just want to talk street culture — slide into our inbox.",
+    "labels": {
+      "email": "Email",
+      "phone": "Phone",
+      "hours": "Hours",
+      "location": "Location"
+    },
+    "hoursValue": "Mon–Fri, 9AM–6PM",
+    "locationValue": "Rabat — Morocco",
+    "followDrop": "FOLLOW THE DROP",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "subject": "Subject",
+    "subjectOptions": {
+      "order": "Order Issue",
+      "collab": "Collaboration",
+      "general": "General Question",
+      "returns": "Returns & Refunds"
+    },
+    "message": "Message",
+    "messagePlaceholder": "What's good...",
+    "required": "Required",
+    "invalidEmail": "Invalid email",
+    "tooShort": "Too short",
+    "send": "Send Message",
+    "sending": "Sending…",
+    "messageSent": "MESSAGE SENT!",
+    "messageSentDesc": "We'll get back to you within 24 hours."
+  },
+  "about": {
+    "whoWeAre": "Who We Are",
+    "the": "THE",
+    "story": "STORY",
+    "intro": "7titaaa was born on the corner of creativity and culture. What started as a local hustle turned into a movement that spans continents.",
+    "whatWeStandFor": "What We Stand For",
+    "ourValues": "OUR VALUES",
+    "values": {
+      "authenticityTitle": "Authenticity",
+      "authenticityDesc": "Every drop is rooted in real street culture, not trend-chasing. We stay true to the art.",
+      "communityTitle": "Community",
+      "communityDesc": "Built for the people who live the lifestyle — creators, artists, and anyone who moves different.",
+      "qualityTitle": "Quality",
+      "qualityDesc": "Premium fabrics, proper construction. Gear that lasts longer than the season."
+    },
+    "stats": {
+      "founded": "Founded",
+      "customers": "Customers",
+      "pieces": "Pieces",
+      "countries": "Countries"
+    },
+    "readyToWear": "READY TO WEAR THE CULTURE?",
+    "exploreDrops": "Explore the latest drops and find your piece of the movement.",
+    "shopNow": "Shop Now"
+  },
+  "login": {
+    "welcomeBack": "Welcome Back",
+    "title": "LOG IN",
+    "email": "Email",
+    "password": "Password",
+    "required": "Required",
+    "invalidEmail": "Invalid email",
+    "min6": "At least 6 characters",
+    "logIn": "Log In",
+    "loggingIn": "Logging in…",
+    "noAccount": "No account?",
+    "signUp": "Sign up",
+    "failed": "Login failed"
+  },
+  "register": {
+    "joinCrew": "Join the Crew",
+    "title": "SIGN UP",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "required": "Required",
+    "tooShort": "Too short",
+    "invalidEmail": "Invalid email",
+    "min6": "At least 6 characters",
+    "signUp": "Sign Up",
+    "creatingAccount": "Creating account…",
+    "haveAccount": "Already have an account?",
+    "logIn": "Log in",
+    "failed": "Registration failed"
+  },
+  "footer": {
+    "tagline": "Premium streetwear rooted in hip-hop culture. Worn by creators, built for the streets.",
+    "shop": "Shop",
+    "company": "Company",
+    "newDrops": "New Drops",
+    "links": {
+      "about": "About",
+      "contact": "Contact",
+      "shippingInfo": "Shipping Info",
+      "returns": "Returns",
+      "privacy": "Privacy Policy"
+    },
+    "rights": "© {{year}} 7titaaa Shop. All rights reserved.",
+    "createdBy": "Created by ZouhairOD"
   }
 }

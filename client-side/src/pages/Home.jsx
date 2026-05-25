@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { categories } from '../data/products'
 import { useProducts } from '../hooks/useProducts'
 import ProductCard from '../components/ProductCard'
@@ -35,6 +36,7 @@ function Section({ children, className = '' }) {
 
 export default function Home() {
   const { items: newDrops, loading } = useProducts({ limit: 8 })
+  const { t } = useTranslation()
 
   return (
     <div>
@@ -51,20 +53,14 @@ export default function Home() {
         </Section>
 
         <Section>
-          <p className="font-mono text-sm tracking-[0.4em] text-primary uppercase mb-4">Who We Are</p>
+          <p className="font-mono text-sm tracking-[0.4em] text-primary uppercase mb-4">{t('home.whoWeAre')}</p>
           <h2 className="font-display text-6xl text-street-black tracking-wide mb-6">
-            THE STORY
+            {t('home.theStory')}
           </h2>
           <div className="space-y-4 text-gray-500 leading-relaxed">
-            <p>
-              7tita is a Moroccan brand that popped off in 2023, and we're basically obsessed with street culture skateboarding, hip-hop, breakdancing, all that good stuff.
-            </p>
-            <p>
-              So we started selling second-hand vintage clothes because, honestly, that's where the real style is at. basically anything that screams authentic street aesthetic.
-            </p>
-            <p>
-              The whole thing is about getting your hands on genuine vintage pieces that have actual history and character. It's way more interesting than new stuff, and it's way easier on your wallet too. If you're trying to build that real streetwear vibe, we got you covered.
-            </p>
+            <p>{t('home.storyP1')}</p>
+            <p>{t('home.storyP2')}</p>
+            <p>{t('home.storyP3')}</p>
           </div>
         </Section>
       </section>
@@ -72,9 +68,9 @@ export default function Home() {
       {/* ─── CATEGORIES GRID ─── */}
       <section className="py-20 px-6 max-w-screen-2xl mx-auto">
         <Section className="mb-12 text-center">
-          <p className="font-mono text-sm tracking-[0.5em] text-primary uppercase mb-3">Browse By</p>
+          <p className="font-mono text-sm tracking-[0.5em] text-primary uppercase mb-3">{t('home.browseBy')}</p>
           <h2 className="font-display text-6xl md:text-6xl text-street-black tracking-wide">
-            CATEGORIES
+            {t('home.categories')}
           </h2>
         </Section>
 
@@ -113,17 +109,17 @@ export default function Home() {
       >
         <Section>
           <p className="font-mono text-[11px] tracking-[0.5em] text-primary-light uppercase mb-4">
-            Limited Edition
+            {t('home.limitedEdition')}
           </p>
           <h2 className="font-display text-6xl md:text-8xl text-white tracking-wider mb-6">
-            DROP <span className="gradient-text">SEASON</span>
+            {t('home.dropSeason')} <span className="gradient-text">{t('home.dropSeasonAccent')}</span>
           </h2>
           <p className="text-white/40 text-sm max-w-md mx-auto mb-8 leading-relaxed">
-            Exclusive pieces that sell out fast. Sign up to get first access to every drop.
+            {t('home.dropDesc')}
           </p>
           <Link to="/shop">
             <AnimatedButton variant="primary" className="mx-auto">
-              See All Drops
+              {t('home.seeAllDrops')}
             </AnimatedButton>
           </Link>
         </Section>
@@ -133,16 +129,16 @@ export default function Home() {
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <Section className="flex items-end justify-between mb-12">
           <div>
-            <p className="font-mono text-[11px] tracking-[0.5em] text-primary uppercase mb-3">Just Landed</p>
+            <p className="font-mono text-[11px] tracking-[0.5em] text-primary uppercase mb-3">{t('home.justLanded')}</p>
             <h2 className="font-display text-5xl md:text-6xl text-street-black tracking-wide">
-              NEW DROPS
+              {t('home.newDrops')}
             </h2>
           </div>
           <Link
             to="/shop"
             className="hidden sm:flex items-center gap-2 font-mono text-xs tracking-widest uppercase text-street-black/50 hover:text-street-black transition-colors group"
           >
-            View All
+            {t('home.viewAll')}
             <motion.svg
               className="w-4 h-4"
               fill="none"
@@ -185,14 +181,14 @@ export default function Home() {
         />
         <Section className="relative z-10">
           <h2 className="font-display text-5xl md:text-7xl tracking-wider mb-4">
-            JOIN THE CULTURE
+            {t('home.joinCulture')}
           </h2>
           <p className="font-mono text-[11px] tracking-[0.4em] opacity-70 uppercase mb-8">
-            Follow us on Instagram
+            {t('home.followInstagram')}
           </p>
           <a href="https://www.instagram.com/7titaaa" target="_blank" rel="noopener noreferrer">
             <AnimatedButton variant="dark" className="mx-auto text-sm px-10 py-4">
-              Follow on Instagram
+              {t('home.followOnInstagram')}
             </AnimatedButton>
           </a>
         </Section>

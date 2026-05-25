@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useCart } from '../context/CartContext'
 
 const tabs = [
   {
     to: '/',
-    label: 'Home',
+    labelKey: 'nav.home',
     exact: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-6 h-6">
@@ -15,7 +16,7 @@ const tabs = [
   },
   {
     to: '/shop',
-    label: 'Shop',
+    labelKey: 'nav.shop',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round"
@@ -25,7 +26,7 @@ const tabs = [
   },
   {
     to: '/contact',
-    label: 'Contact',
+    labelKey: 'nav.contact',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round"
@@ -35,7 +36,7 @@ const tabs = [
   },
   {
     to: '/checkout',
-    label: 'Cart',
+    labelKey: 'nav.cart',
     isCart: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-6 h-6">
@@ -48,11 +49,12 @@ const tabs = [
 
 export default function BottomNav() {
   const { cartCount } = useCart()
+  const { t } = useTranslation()
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-street-black border-t border-white/10">
       <div className="flex items-stretch h-16">
-        {tabs.map(({ to, label, exact, icon, isCart }) => (
+        {tabs.map(({ to, labelKey, exact, icon, isCart }) => (
           <NavLink
             key={to}
             to={to}
@@ -74,7 +76,7 @@ export default function BottomNav() {
                 </span>
               )}
             </span>
-            <span className="font-mono text-[9px] tracking-widest uppercase">{label}</span>
+            <span className="font-mono text-[9px] tracking-widest uppercase">{t(labelKey)}</span>
           </NavLink>
         ))}
       </div>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import logo from '../assets/7titaaa_logo2.svg'
 
 const socials = [
@@ -31,7 +32,10 @@ const socials = [
   },
 ]
 
+const SHOP_CATEGORIES = ['Hoodies', 'Sneakers', 'Caps', 'Tees', 'Jackets']
+
 export default function Footer() {
+  const { t } = useTranslation()
   return (
     <footer className="bg-street-black text-white">
       {/* Top gradient line */}
@@ -46,7 +50,7 @@ export default function Footer() {
               <img src={logo} alt="7titaaa" className="h-24 w-auto" />
             </Link>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs font-light">
-              Premium streetwear rooted in hip-hop culture. Worn by creators, built for the streets.
+              {t('footer.tagline')}
             </p>
             <div className="flex gap-4 mt-6">
               {socials.map(s => (
@@ -66,31 +70,39 @@ export default function Footer() {
 
           {/* Shop links */}
           <div>
-            <h4 className="font-mono text-[10px] tracking-[0.4em] text-white/40 uppercase mb-5">Shop</h4>
+            <h4 className="font-mono text-[10px] tracking-[0.4em] text-white/40 uppercase mb-5">{t('footer.shop')}</h4>
             <ul className="space-y-3">
-              {['Hoodies', 'Sneakers', 'Caps', 'Tees', 'Jackets', 'New Drops'].map(item => (
+              {SHOP_CATEGORIES.map(item => (
                 <li key={item}>
                   <Link
                     to={`/shop?category=${item}`}
                     className="text-white/50 hover:text-white text-sm transition-colors duration-200 font-light"
                   >
-                    {item}
+                    {t(`shop.categories.${item}`)}
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  to="/shop"
+                  className="text-white/50 hover:text-white text-sm transition-colors duration-200 font-light"
+                >
+                  {t('footer.newDrops')}
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Company links */}
           <div>
-            <h4 className="font-mono text-[10px] tracking-[0.4em] text-white/40 uppercase mb-5">Company</h4>
+            <h4 className="font-mono text-[10px] tracking-[0.4em] text-white/40 uppercase mb-5">{t('footer.company')}</h4>
             <ul className="space-y-3">
               {[
-                { label: 'About', to: '/about' },
-                { label: 'Contact', to: '/contact' },
-                { label: 'Shipping Info', to: '/' },
-                { label: 'Returns', to: '/' },
-                { label: 'Privacy Policy', to: '/' },
+                { label: t('footer.links.about'), to: '/about' },
+                { label: t('footer.links.contact'), to: '/contact' },
+                { label: t('footer.links.shippingInfo'), to: '/' },
+                { label: t('footer.links.returns'), to: '/' },
+                { label: t('footer.links.privacy'), to: '/' },
               ].map(item => (
                 <li key={item.label}>
                   <Link
@@ -108,7 +120,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/40 mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="font-mono text-[10px] text-white tracking-widest uppercase">
-            © {new Date().getFullYear()} 7titaaa Shop. All rights reserved.
+            {t('footer.rights', { year: new Date().getFullYear() })}
           </p>
           <a
             href="https://zouhairod.vercel.app/"
@@ -116,7 +128,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="font-mono text-[10px] text-white hover:text-white/70 tracking-widest uppercase transition-colors"
           >
-            Created by ZouhairOD
+            {t('footer.createdBy')}
           </a>
         </div>
       </div>
