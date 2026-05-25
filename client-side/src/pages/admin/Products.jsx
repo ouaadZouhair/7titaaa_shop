@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react'
 import api from '../../lib/api'
@@ -69,6 +70,13 @@ export default function Products() {
     fetchProducts()
   }
 
+  const handleToggleAvailability = async (e, p) => {
+    e.stopPropagation()
+    await api.patch(`/products/${p.id}/availability`, { isAvailable: !p.isAvailable })
+    setItems((prev) => prev.map((x) => x.id === p.id ? { ...x, isAvailable: !p.isAvailable } : x))
+  }
+
+  const navigate = useNavigate()
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
@@ -124,6 +132,7 @@ export default function Products() {
                 <th className="font-mono text-[10px] tracking-widest uppercase text-gray-500 px-4 py-3">Category</th>
                 <th className="font-mono text-[10px] tracking-widest uppercase text-gray-500 px-4 py-3">Price</th>
                 <th className="font-mono text-[10px] tracking-widest uppercase text-gray-500 px-4 py-3">Flags</th>
+                <th className="font-mono text-[10px] tracking-widest uppercase text-gray-500 px-4 py-3 text-center">Available</th>
                 <th className="font-mono text-[10px] tracking-widest uppercase text-gray-500 px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -135,7 +144,11 @@ export default function Products() {
                 <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-400 text-sm">No products found.</td></tr>
               )}
               {!loading && items.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                <tr
+                  key={p.id}
+                  onClick={() => navigate(`/product/${p.id}`)}
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <img src={resolveImageUrl(p.image)} alt={p.name} className="w-10 h-10 rounded-md object-cover bg-gray-100" />
@@ -166,7 +179,16 @@ export default function Products() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => handleToggleAvailability(e, p)}
+                      title={p.isAvailable ? 'Mark as sold out' : 'Mark as available'}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none ${p.isAvailable ? 'bg-black' : 'bg-gray-300'}`}
+                    >
+                      <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform duration-200 ${p.isAvailable ? 'translate-x-4' : 'translate-x-1'}`} />
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="inline-flex items-center gap-1">
                       <button
                         onClick={() => { setEditing(p); setModalOpen(true) }}

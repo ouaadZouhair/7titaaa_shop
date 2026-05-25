@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { useCart } from '../context/CartContext'
 import AnimatedButton from '../components/AnimatedButton'
 import api from '../lib/api'
+import { resolveImageUrl } from '../lib/uploads'
 
 const WHATSAPP_NUMBER = '212704634570'
 
@@ -54,6 +55,7 @@ export default function Checkout() {
           image: item.image,
           category: item.category,
           size: item.size,
+          type: item.type,
         })),
       })
       setOrderRef(data.order.ref)
@@ -186,9 +188,9 @@ export default function Checkout() {
                       >
                         <Link to={`/product/${item.id}`}>
                           <img
-                            src={item.image}
+                            src={resolveImageUrl(item.image)}
                             alt={item.name}
-                            className="w-20 h-24 object-cover rounded-sm flex-shrink-0"
+                            className="w-20 h-24 object-cover rounded-sm shrink-0"
                           />
                         </Link>
                         <div className="flex-1 min-w-0">
@@ -198,11 +200,13 @@ export default function Checkout() {
                                 {item.category}
                               </p>
                               <h3 className="font-semibold text-sm text-street-black leading-tight">{item.name}</h3>
-                              <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">Size: {item.size}</p>
+                              <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">
+                                Size: {item.size}{item.type ? ` · ${item.type}` : ''}
+                              </p>
                             </div>
                             <button
                               onClick={() => removeFromCart(item.id, item.size)}
-                              className="text-gray-300 hover:text-accent-red transition-colors flex-shrink-0"
+                              className="text-gray-300 hover:text-accent-red transition-colors shrink-0"
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -324,10 +328,12 @@ export default function Checkout() {
                   <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase">Items ({cartCount})</p>
                   {cartItems.map(item => (
                     <div key={`${item.id}-${item.size}`} className="flex gap-4 items-center">
-                      <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-sm flex-shrink-0" />
+                      <img src={resolveImageUrl(item.image)} alt={item.name} className="w-16 h-20 object-cover rounded-sm shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-street-black leading-tight">{item.name}</p>
-                        <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">Size: {item.size}</p>
+                        <p className="font-mono text-[10px] text-gray-400 mt-1 uppercase">
+                          Size: {item.size}{item.type ? ` · ${item.type}` : ''}
+                        </p>
                       </div>
                       <span className="text-sm font-bold text-street-black">{item.price.toFixed(2)} DH</span>
                     </div>
@@ -335,7 +341,7 @@ export default function Checkout() {
                 </div>
 
                 <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-sm mb-5">
-                  <svg className="w-4 h-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-4 h-4 text-green-600 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.122 1.523 5.854L.057 23.886a.5.5 0 00.606.63l6.257-1.641A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.876 9.876 0 01-5.031-1.373l-.36-.214-3.733.979 1.003-3.628-.235-.374A9.86 9.86 0 012.1 12C2.1 6.533 6.533 2.1 12 2.1S21.9 6.533 21.9 12 17.467 21.9 12 21.9z"/>
                   </svg>
@@ -366,12 +372,14 @@ export default function Checkout() {
             <div className="space-y-3 mb-5">
               {cartItems.map(item => (
                 <div key={`${item.id}-${item.size}`} className="flex gap-3 items-center">
-                  <img src={item.image} alt={item.name} className="w-12 h-14 object-cover rounded-sm flex-shrink-0" />
+                  <img src={resolveImageUrl(item.image)} alt={item.name} className="w-12 h-14 object-cover rounded-sm shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-street-black truncate">{item.name}</p>
-                    <p className="font-mono text-[10px] text-gray-400 uppercase">{item.size}</p>
+                    <p className="font-mono text-[10px] text-gray-400 uppercase">
+                      {item.size}{item.type ? ` · ${item.type}` : ''}
+                    </p>
                   </div>
-                  <span className="text-sm font-semibold flex-shrink-0">{item.price.toFixed(2)} DH</span>
+                  <span className="text-sm font-semibold shrink-0">{item.price.toFixed(2)} DH</span>
                 </div>
               ))}
             </div>

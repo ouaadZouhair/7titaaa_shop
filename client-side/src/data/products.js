@@ -28,7 +28,7 @@ export const categories = [
   },
   {
     id: 4,
-    name: "Tees",
+    name: "Tshirts",
     image: catTees,
     count: 12,
     span: "col-span-1 row-span-1",
@@ -41,6 +41,10 @@ export const categories = [
     span: "col-span-1 row-span-1",
   },
 ]
+
+export const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+
+export const types = ['Normal', 'Oversize']
 
 export const brands = [
   { name: "Nike", logo: "NIKE" },

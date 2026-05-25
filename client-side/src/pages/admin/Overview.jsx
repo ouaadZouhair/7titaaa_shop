@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { Package, Sparkles, Star, Layers, ArrowUpRight, ShoppingBag, Mail, MailOpen } from 'lucide-react'
+import { Package, ArrowUpRight, ShoppingBag, Mail, MailOpen } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../../lib/api'
 import { resolveImageUrl } from '../../lib/uploads'
@@ -73,16 +73,13 @@ export default function Overview() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
         <StatCard icon={Package}     label="Total Products" value={loading ? '—' : data.products.total} />
-        <StatCard icon={Sparkles}    label="New Drops"      value={loading ? '—' : data.products.new} />
-        <StatCard icon={Star}        label="Featured"       value={loading ? '—' : data.products.featured} />
-        <StatCard icon={Layers}      label="Categories"     value={loading ? '—' : data.products.categories} />
         <StatCard icon={ShoppingBag} label="Total Orders"   value={loading ? '—' : ordersTotal} />
       </div>
 
       {/* Bottom panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
         {/* Recent products */}
         <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -173,22 +170,6 @@ export default function Overview() {
                 {!m.isRead && (
                   <span className="shrink-0 mt-1.5 w-2 h-2 rounded-full bg-red-500" />
                 )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="font-semibold mb-4">Categories</h2>
-          <div className="space-y-3">
-            {data.categories.length === 0 && !loading && (
-              <p className="text-sm text-gray-400 py-4 text-center">No data.</p>
-            )}
-            {data.categories.map((c) => (
-              <div key={c.category} className="flex items-center justify-between">
-                <span className="text-sm">{c.category}</span>
-                <span className="font-mono text-[11px] tracking-widest text-gray-400">{c.count}</span>
               </div>
             ))}
           </div>

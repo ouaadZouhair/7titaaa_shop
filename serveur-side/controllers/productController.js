@@ -4,12 +4,13 @@ import {
   createProduct as createProductModel,
   updateProduct as updateProductModel,
   deleteProduct as deleteProductModel,
+  setProductAvailability,
   countProducts,
   listCategories,
 } from "../models/productModel.js";
 
 const validateProduct = (body) => {
-  const required = ["name", "price", "category", "image"];
+  const required = ["name", "category", "image"];
   for (const key of required) {
     if (body[key] === undefined || body[key] === null || body[key] === "") {
       const err = new Error(`${key} is required`);
@@ -17,10 +18,12 @@ const validateProduct = (body) => {
       throw err;
     }
   }
-  if (isNaN(Number(body.price)) || Number(body.price) < 0) {
-    const err = new Error("price must be a non-negative number");
-    err.status = 400;
-    throw err;
+  if (body.price !== undefined && body.price !== null && body.price !== "") {
+    if (isNaN(Number(body.price)) || Number(body.price) < 0) {
+      const err = new Error("price must be a non-negative number");
+      err.status = 400;
+      throw err;
+    }
   }
 };
 
@@ -75,6 +78,24 @@ export const remove = async (req, res, next) => {
       throw err;
     }
     res.json({ success: true });
+  } catch (err) { next(err); }
+};
+
+export const patchAvailability = async (req, res, next) => {
+  try {
+    const { isAvailable } = req.body;
+    if (typeof isAvailable !== "boolean") {
+      const err = new Error("isAvailable must be a boolean");
+      err.status = 400;
+      throw err;
+    }
+    const product = await setProductAvailability(req.params.id, isAvailable);
+    if (!product) {
+      const err = new Error("Product not found");
+      err.status = 404;
+      throw err;
+    }
+    res.json({ product });
   } catch (err) { next(err); }
 };
 

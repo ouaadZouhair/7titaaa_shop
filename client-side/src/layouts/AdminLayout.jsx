@@ -10,7 +10,7 @@ import {
   ShoppingBag,
   MessageSquare,
 } from 'lucide-react'
-import logo from '../assets/7titaaa_logo2.png'
+import logo from '../assets/7titaaa_logo2.svg'
 import { useAuth } from '../context/AuthContext'
 import { AdminCountsProvider, useAdminCounts } from '../context/AdminCountsContext'
 

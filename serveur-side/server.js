@@ -6,7 +6,7 @@ import "dotenv/config";
 import { pool, ensureDatabase } from "./config/db.js";
 import { ensureUsersTable } from "./models/userModel.js";
 import { ensureProductsTable } from "./models/productModel.js";
-import { ensureOrdersTable } from "./models/orderModel.js";
+import { ensureOrdersTable, ensureOrderItemsTable } from "./models/orderModel.js";
 import { ensureMessagesTable } from "./models/messageModel.js";
 import apiRouter from "./routes/index.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
@@ -48,6 +48,7 @@ const start = async () => {
     await ensureUsersTable();
     await ensureProductsTable();
     await ensureOrdersTable();
+    await ensureOrderItemsTable(); // FK: order_items → orders + products
     await ensureMessagesTable();
     console.log("MySQL connected");
 

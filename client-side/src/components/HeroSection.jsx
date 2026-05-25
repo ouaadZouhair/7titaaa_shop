@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
-import logo from '../assets/7titaaa_logo2.png'
+import logo from '../assets/7titaaa_logo2.svg'
 
-const modelModules = import.meta.glob('../assets/models/*.{jpg,jpeg,webp,png}', { eager: true, query: '?url', import: 'default' })
-const allImages = Object.values(modelModules)
+const modelModules = import.meta.glob(
+  '../assets/models/*.{jpg,jpeg,webp,png}',
+  { eager: true, query: '?url', import: 'default' }
+)
+const allImages   = Object.values(modelModules)
 const leftImages  = allImages.filter((_, i) => i % 2 === 0)
 const rightImages = allImages.filter((_, i) => i % 2 === 1)
 
@@ -43,12 +46,26 @@ function ScrollStrip({ images, direction }) {
   const total = n * (PAUSE + SLIDE)
   const name  = `heroStrip_${direction}`
 
+  /*
+   * Performance notes:
+   *  - willChange:'transform' promotes each strip to its own GPU layer so
+   *    the continuous CSS animation never triggers layout/paint.
+   *  - The first image in each strip gets fetchpriority="high" so it's the
+   *    browser's LCP candidate and downloaded before off-screen images.
+   *  - All subsequent images are loading="lazy" so they only fetch when the
+   *    strip is about to scroll them into view.
+   */
   return (
     <>
       <style>{`@keyframes ${name}{${buildKeyframes(n, direction)}}`}</style>
       <div
         className="flex flex-col w-full"
-        style={{ animation: `${name} ${total}s linear infinite`, willChange: 'transform' }}
+        style={{
+          animation: `${name} ${total}s linear infinite`,
+          willChange: 'transform',
+          /* Contain paint to this element — improves compositing */
+          contain: 'layout style',
+        }}
       >
         {[...images, ...images].map((src, i) => (
           <div key={i} className="relative w-full shrink-0" style={{ height: '100vh' }}>
@@ -56,7 +73,10 @@ function ScrollStrip({ images, direction }) {
               src={src}
               alt=""
               className="w-full h-full object-cover object-center"
-              loading={i < 2 ? 'eager' : 'lazy'}
+              /* First image is LCP — load eagerly at high priority */
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={i === 0 ? 'high' : 'low'}
+              decoding={i === 0 ? 'sync' : 'async'}
             />
           </div>
         ))}
@@ -99,9 +119,15 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-
         >
-          <img src={logo} alt="7titaaa" className="w-64 md:w-96 lg:w-120" />
+          {/* Logo is above-the-fold and important — no lazy loading */}
+          <img
+            src={logo}
+            alt="7titaaa"
+            className="w-64 md:w-96 lg:w-120"
+            fetchPriority="high"
+            decoding="sync"
+          />
         </motion.div>
 
         <motion.div
@@ -112,9 +138,7 @@ export default function HeroSection() {
         >
           <Link
             to="/shop"
-
             className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 overflow-hidden"
-
           >
             <span className="absolute inset-0 border-2 border-white" />
             <span className="absolute inset-0 bg-white translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />

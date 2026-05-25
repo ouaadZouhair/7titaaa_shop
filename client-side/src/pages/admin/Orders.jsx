@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../lib/api'
+import { resolveImageUrl } from '../../lib/uploads'
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
@@ -123,7 +124,7 @@ export default function Orders() {
                     </td>
                     <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{order.city}</td>
                     <td className="px-4 py-3 text-gray-500 hidden lg:table-cell">
-                      {order.items?.length ?? 0} item{(order.items?.length ?? 0) !== 1 ? 's' : ''}
+                      {order.orderItems?.length ?? 0} item{(order.orderItems?.length ?? 0) !== 1 ? 's' : ''}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold text-gray-900">
                       {Number(order.total).toFixed(2)} DH
@@ -176,11 +177,11 @@ export default function Orders() {
                           <div>
                             <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Items</p>
                             <div className="space-y-2">
-                              {(order.items || []).map((item, i) => (
+                              {(order.orderItems || []).map((item, i) => (
                                 <div key={i} className="flex items-center gap-3">
                                   {item.image && (
                                     <img
-                                      src={item.image}
+                                      src={resolveImageUrl(item.image)}
                                       alt={item.name}
                                       className="w-10 h-12 object-cover rounded-sm shrink-0"
                                     />
@@ -188,11 +189,11 @@ export default function Orders() {
                                   <div className="min-w-0">
                                     <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
                                     <p className="font-mono text-[10px] text-gray-400 uppercase">
-                                      {item.category} · Size {item.size}
+                                      {item.category} · Size {item.size}{item.type ? ` · ${item.type}` : ''}
                                     </p>
                                   </div>
                                   <span className="ml-auto text-sm font-semibold text-gray-700 shrink-0">
-                                    {Number(item.price).toFixed(2)} DH
+                                    {Number(item.unit_price).toFixed(2)} DH
                                   </span>
                                 </div>
                               ))}

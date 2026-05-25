@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { categories, sizes, types } from '../../data/products'
 import { motion, AnimatePresence } from 'motion/react'
 import { X, Upload, Plus, Trash2, Loader2, ImagePlus } from 'lucide-react'
 import { uploadImage, resolveImageUrl } from '../../lib/uploads'
@@ -12,6 +13,7 @@ const emptyProduct = {
   images: [],
   description: '',
   size: '',
+  type: 'Normal',
   isNew: false,
   isFeatured: false,
   rating: 0,
@@ -102,18 +104,13 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
     if (!form.image) { setError('Please upload a main image'); return }
 
     const finalPrice = priceMode === 'pct'
-      ? computedSalePrice
-      : (form.price === '' ? null : Number(form.price))
-
-    if (!finalPrice || finalPrice <= 0) {
-      setError('Please set a valid sale price')
-      return
-    }
+      ? (computedSalePrice ?? null)
+      : (form.price === '' || form.price == null ? null : Number(form.price))
 
     try {
       await onSubmit({
         ...form,
-        price: finalPrice,
+        price: finalPrice ?? 0,
         originalPrice: form.originalPrice === '' || form.originalPrice == null
           ? null
           : Number(form.originalPrice),
@@ -180,25 +177,45 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                 className={input}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className={lbl}>Category</label>
-                <input
+                <select
                   required
                   value={form.category}
                   onChange={(e) => update('category', e.target.value)}
-                  placeholder="Hoodies"
                   className={input}
-                />
+                >
+                  <option value="">— Select —</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className={lbl}>Size</label>
-                <input
+                <select
                   value={form.size}
                   onChange={(e) => update('size', e.target.value)}
-                  placeholder="M"
                   className={input}
-                />
+                >
+                  <option value="">— Select —</option>
+                  {sizes.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={lbl}>Type</label>
+                <select
+                  value={form.type}
+                  onChange={(e) => update('type', e.target.value)}
+                  className={input}
+                >
+                  {types.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -225,7 +242,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
               {/* Sale price */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className={lbl} style={{ marginBottom: 0 }}>Sale price</label>
+                  <label className={lbl} style={{ marginBottom: 0 }}>{priceMode === 'dh' ? 'Sale price' : 'Discount'}</label>
                   <div className="flex rounded-md overflow-hidden border border-gray-200 text-[10px] font-mono tracking-widest">
                     <button
                       type="button"
@@ -246,7 +263,6 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
 
                 {priceMode === 'dh' ? (
                   <input
-                    required
                     type="number"
                     step="0.01"
                     min="0"

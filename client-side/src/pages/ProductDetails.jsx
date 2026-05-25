@@ -48,11 +48,12 @@ export default function ProductDetails() {
   }
 
   const related = relatedAll.filter(p => p.id !== product.id).slice(0, 4)
+  const isAvailable = product.isAvailable !== false
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
   const defaultSize = product.size || 'M'
-  const gallery = product.images?.length ? product.images : [product.image]
+  const gallery = [product.image, ...(product.images || [])].filter(Boolean)
 
   const handleAddToCart = () => {
     addToCart(product, defaultSize, 1)
@@ -84,7 +85,7 @@ export default function ProductDetails() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setActiveImg(i)}
-                className={`flex-shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-sm overflow-hidden border-2 transition-colors ${
+                className={`shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-sm overflow-hidden border-2 transition-colors ${
                   activeImg === i ? 'border-primary' : 'border-transparent'
                 }`}
               >
@@ -95,7 +96,7 @@ export default function ProductDetails() {
 
           {/* Main image */}
           <div
-            className="flex-1 relative rounded-sm overflow-hidden aspect-[4/5] bg-gray-100 cursor-zoom-in"
+            className="flex-1 relative rounded-sm overflow-hidden aspect-4/5 bg-gray-100 cursor-zoom-in"
             onMouseMove={handleZoomMove}
             onMouseLeave={handleZoomLeave}
           >
@@ -130,15 +131,23 @@ export default function ProductDetails() {
 
             {/* Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
-              {product.isNew && (
-                <span className="bg-primary text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
-                  NEW
+              {!isAvailable ? (
+                <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
+                  Sold Out
                 </span>
-              )}
-              {discount && (
-                <span className="bg-accent-red text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
-                  -{discount}%
-                </span>
+              ) : (
+                <>
+                  {product.isNew && (
+                    <span className="bg-primary text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
+                      NEW
+                    </span>
+                  )}
+                  {discount && (
+                    <span className="bg-accent-red text-white text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-sm tracking-wider uppercase">
+                      -{discount}%
+                    </span>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -185,7 +194,7 @@ export default function ProductDetails() {
           {/* Description */}
           <p className="text-gray-500 leading-relaxed mb-8 text-sm">{product.description}</p>
 
-          {/* Size & Quantity — fixed */}
+          {/* Size, Type & Quantity */}
           <div className="flex gap-6 mb-8">
             <div>
               <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Size</p>
@@ -193,6 +202,14 @@ export default function ProductDetails() {
                 {defaultSize}
               </span>
             </div>
+            {product.type && (
+              <div>
+                <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Type</p>
+                <span className="inline-block px-4 py-2 border border-gray-200 rounded-sm font-mono text-xs text-street-black bg-gray-50">
+                  {product.type}
+                </span>
+              </div>
+            )}
             <div>
               <p className="font-mono text-[10px] tracking-widest uppercase text-gray-400 mb-2">Quantity</p>
               <span className="inline-block px-4 py-2 border border-gray-200 rounded-sm font-mono text-xs text-street-black bg-gray-50">
@@ -203,28 +220,37 @@ export default function ProductDetails() {
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
-            <AnimatedButton
-              variant={added ? 'primary' : 'dark'}
-              onClick={handleAddToCart}
-              fullWidth
-              className="py-4"
-            >
-              {added ? '✓ Added to Cart!' : 'Add to Cart'}
-            </AnimatedButton>
-            <AnimatedButton
-              variant="gradient"
-              onClick={() => { handleAddToCart(); navigate('/checkout') }}
-              fullWidth
-              className="py-4"
-            >
-              Buy Now
-            </AnimatedButton>
+            {!isAvailable ? (
+              <div className="w-full py-4 text-center font-mono text-sm tracking-widest uppercase bg-gray-100 text-gray-400 rounded-sm cursor-not-allowed select-none">
+                Sold Out
+              </div>
+            ) : (
+              <>
+                <AnimatedButton
+                  variant={added ? 'primary' : 'dark'}
+                  onClick={handleAddToCart}
+                  fullWidth
+                  className="py-4"
+                >
+                  {added ? '✓ Added to Cart!' : 'Add to Cart'}
+                </AnimatedButton>
+                <AnimatedButton
+                  variant="gradient"
+                  onClick={() => { handleAddToCart(); navigate('/checkout') }}
+                  fullWidth
+                  className="py-4"
+                >
+                  Buy Now
+                </AnimatedButton>
+              </>
+            )}
           </div>
 
           {/* Meta */}
           <div className="border-t border-gray-100 pt-6 space-y-2">
             {[
               { label: 'Category', value: product.category },
+              { label: 'Type', value: product.type },
               { label: 'Tags', value: (product.tags || []).join(', ') },
             ]
               .filter((m) => m.value)

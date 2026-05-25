@@ -27,6 +27,8 @@ export default function ProductCard({ product }) {
     navigate('/checkout')
   }
 
+  const isAvailable = product.isAvailable !== false
+
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
@@ -52,21 +54,29 @@ export default function ProductCard({ product }) {
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
-            {product.isNew && (
-              <span className="bg-red-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
-                {t('product.new')}
+            {!isAvailable ? (
+              <span className="bg-gray-700 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
+                Sold out
               </span>
-            )}
-            {discount && (
-              <span className="bg-green-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
-                -{discount}%
-              </span>
+            ) : (
+              <>
+                {product.isNew && (
+                  <span className="bg-red-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
+                    {t('product.new')}
+                  </span>
+                )}
+                {discount && (
+                  <span className="bg-green-600 text-white text-[9px] font-mono font-bold px-2.5 py-1 tracking-[0.25em] uppercase">
+                    -{discount}%
+                  </span>
+                )}
+              </>
             )}
           </div>
 
-          {/* Hover overlay */}
+          {/* Hover overlay — hidden when sold out */}
           <AnimatePresence>
-            {hovered && (
+            {hovered && isAvailable && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

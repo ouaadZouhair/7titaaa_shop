@@ -12,22 +12,24 @@ export const ensureProductsTable = async () => {
       images JSON NULL,
       description TEXT NULL,
       size VARCHAR(20) NULL,
+      type VARCHAR(20) NULL DEFAULT 'Normal',
       is_new TINYINT(1) NOT NULL DEFAULT 0,
       is_featured TINYINT(1) NOT NULL DEFAULT 0,
       rating DECIMAL(2,1) NOT NULL DEFAULT 0,
       reviews INT NOT NULL DEFAULT 0,
       tags JSON NULL,
       quality TINYINT(1) NOT NULL DEFAULT 5,
+      is_available TINYINT(1) NOT NULL DEFAULT 1,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_category (category),
       INDEX idx_featured (is_featured),
       INDEX idx_new (is_new)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-  // add quality column to existing tables that pre-date this field
-  await pool.query(`
-    ALTER TABLE products ADD COLUMN IF NOT EXISTS quality TINYINT(1) NOT NULL DEFAULT 5
-  `).catch(() => {});
+  // migrations for columns added after initial release
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS quality TINYINT(1) NOT NULL DEFAULT 5`).catch(() => {});
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS type VARCHAR(20) NULL DEFAULT 'Normal'`).catch(() => {});
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS is_available TINYINT(1) NOT NULL DEFAULT 1`).catch(() => {});
 };
 
 const rowToProduct = (row) => {
@@ -47,12 +49,14 @@ const rowToProduct = (row) => {
     images: parse(row.images),
     description: row.description,
     size: row.size,
+    type: row.type || 'Normal',
     isNew: !!row.is_new,
     isFeatured: !!row.is_featured,
     rating: Number(row.rating),
     reviews: row.reviews,
     tags: parse(row.tags),
     quality: row.quality != null ? Number(row.quality) : 5,
+    isAvailable: row.is_available == null ? true : !!row.is_available,
     created_at: row.created_at,
   };
 };
@@ -98,22 +102,24 @@ const toRow = (p) => ({
   images: JSON.stringify(p.images || []),
   description: p.description || null,
   size: p.size || null,
+  type: p.type || 'Normal',
   is_new: p.isNew ? 1 : 0,
   is_featured: p.isFeatured ? 1 : 0,
   rating: p.rating ?? 0,
   reviews: p.reviews ?? 0,
   tags: JSON.stringify(p.tags || []),
   quality: Math.min(5, Math.max(1, Number(p.quality) || 5)),
+  is_available: p.isAvailable === false ? 0 : 1,
 });
 
 export const createProduct = async (p) => {
   const row = toRow(p);
   const [result] = await pool.query(
-    `INSERT INTO products (name, price, original_price, category, image, images, description, size, is_new, is_featured, rating, reviews, tags, quality)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO products (name, price, original_price, category, image, images, description, size, type, is_new, is_featured, rating, reviews, tags, quality, is_available)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       row.name, row.price, row.original_price, row.category, row.image, row.images,
-      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality,
+      row.description, row.size, row.type, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality, row.is_available,
     ]
   );
   return getProductById(result.insertId);
@@ -122,14 +128,19 @@ export const createProduct = async (p) => {
 export const updateProduct = async (id, p) => {
   const row = toRow(p);
   await pool.query(
-    `UPDATE products SET name=?, price=?, original_price=?, category=?, image=?, images=?, description=?, size=?, is_new=?, is_featured=?, rating=?, reviews=?, tags=?, quality=?
+    `UPDATE products SET name=?, price=?, original_price=?, category=?, image=?, images=?, description=?, size=?, type=?, is_new=?, is_featured=?, rating=?, reviews=?, tags=?, quality=?, is_available=?
      WHERE id=?`,
     [
       row.name, row.price, row.original_price, row.category, row.image, row.images,
-      row.description, row.size, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality,
+      row.description, row.size, row.type, row.is_new, row.is_featured, row.rating, row.reviews, row.tags, row.quality, row.is_available,
       id,
     ]
   );
+  return getProductById(id);
+};
+
+export const setProductAvailability = async (id, isAvailable) => {
+  await pool.query("UPDATE products SET is_available = ? WHERE id = ?", [isAvailable ? 1 : 0, id]);
   return getProductById(id);
 };
 

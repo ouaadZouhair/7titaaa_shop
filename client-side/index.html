@@ -2,13 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/7titaaa_logo2.png" />
+    <link rel="icon" type="image/png" href="/src/assets/7titaaa_logo2.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>7titaaa Shop</title>
-    <meta name="description" content="Premium streetwear for the culture. Hoodies, sneakers, caps, tees & jackets." />
+    <meta name="description" content="Premium streetwear for the culture. Hoodies, sneakers, caps, tees &amp; jackets." />
+
+    <!-- ── Resource hints ─────────────────────────────── -->
+    <!-- Resolve Google Fonts DNS before the stylesheet hits -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+    <!-- Open the TCP connection early so font bytes arrive sooner -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- ── Google Fonts ───────────────────────────────── -->
+    <!--
+      display=swap → text stays visible in fallback font while web-font loads.
+      Only load the exact weights we use (300,400,500,600,700,900 → reduced
+      to 400,500,700,900 — Inter 300 is not referenced in any component).
+    -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ── Theme color (prevents white flash on mobile) ─ -->
+    <meta name="theme-color" content="#0a0a0a" />
   </head>
   <body>
     <div id="root"></div>

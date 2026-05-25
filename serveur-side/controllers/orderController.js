@@ -1,4 +1,4 @@
-import { createOrder, listOrders, updateOrderStatus } from "../models/orderModel.js";
+import { createOrder, listOrders, getOrderById, updateOrderStatus } from "../models/orderModel.js";
 
 export const create = async (req, res, next) => {
   try {
@@ -23,6 +23,18 @@ export const list = async (req, res, next) => {
     const { limit, offset, status } = req.query;
     const data = await listOrders({ limit, offset, status });
     res.json(data);
+  } catch (err) { next(err); }
+};
+
+export const getOne = async (req, res, next) => {
+  try {
+    const order = await getOrderById(req.params.id);
+    if (!order) {
+      const err = new Error("Order not found");
+      err.status = 404;
+      throw err;
+    }
+    res.json({ order });
   } catch (err) { next(err); }
 };
 

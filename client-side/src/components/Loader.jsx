@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import logo from '../assets/7titaaa_logo2.png'
+import logo from '../assets/7titaaa_logo2.svg'
 import avatar from '../assets/profiel/ZouhairOD_profiel.png'
 
 export default function Loader() {
@@ -21,7 +21,7 @@ export default function Loader() {
 
   
 
-      {/* Dots */}
+      {/* Dots
       <div className="flex gap-2">
         {[0, 1, 2].map(i => (
           <motion.span
@@ -31,7 +31,7 @@ export default function Loader() {
             transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
           />
         ))}
-      </div>
+      </div> */}
 
       {/* Portfolio credit card */}
       <motion.div

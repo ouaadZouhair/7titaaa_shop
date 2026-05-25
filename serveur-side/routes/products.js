@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { list, getOne, create, update, remove, stats } from "../controllers/productController.js";
+import { list, getOne, create, update, remove, patchAvailability, stats } from "../controllers/productController.js";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
@@ -10,6 +10,7 @@ router.get("/:id", getOne);
 
 router.post("/", requireAuth, requireRole("admin"), create);
 router.put("/:id", requireAuth, requireRole("admin"), update);
+router.patch("/:id/availability", requireAuth, requireRole("admin"), patchAvailability);
 router.delete("/:id", requireAuth, requireRole("admin"), remove);
 
 export default router;
