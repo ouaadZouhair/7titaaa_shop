@@ -29,26 +29,50 @@ const SectionTitle = ({ children }) => (
 )
 
 function ProductForm({ initial, onClose, onSubmit, submitting }) {
-  const [form, setForm] = useState(() =>
-    initial ? { ...emptyProduct, ...initial } : emptyProduct
-  )
+  // The actual (base) price lives in `originalPrice`. On edit, normalize it:
+  // if the product has no struck-through original, its sell price IS the base.
+  const [form, setForm] = useState(() => {
+    if (!initial) return emptyProduct
+    const base = initial.originalPrice ?? initial.price ?? ''
+    return { ...emptyProduct, ...initial, originalPrice: base }
+  })
   const [tagInput, setTagInput] = useState('')
   const [error, setError] = useState('')
   const [mainUploading, setMainUploading] = useState(false)
   const [extraUploading, setExtraUploading] = useState(false)
-  const [priceMode, setPriceMode] = useState('dh') // 'dh' | 'pct'
-  const [pctInput, setPctInput] = useState('')
+  const [priceMode, setPriceMode] = useState('pct') // 'dh' (amount off) | 'pct' (percent off)
+
+  const initialDiscounted =
+    initial?.originalPrice != null &&
+    initial?.price != null &&
+    Number(initial.price) < Number(initial.originalPrice)
+  const [pctInput, setPctInput] = useState(() =>
+    initialDiscounted
+      ? String(Math.round(((initial.originalPrice - initial.price) / initial.originalPrice) * 100))
+      : ''
+  )
+  const [dhInput, setDhInput] = useState(() =>
+    initialDiscounted
+      ? String(Math.round((initial.originalPrice - initial.price) * 100) / 100)
+      : ''
+  )
   const mainFileRef = useRef(null)
   const extraFileRef = useRef(null)
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }))
 
-  // sale price computed from original price + discount %
+  // Sell price = actual price minus the discount (percent off, or fixed DH amount off).
   const computedSalePrice = (() => {
     const orig = Number(form.originalPrice)
-    const pct = Number(pctInput)
-    if (!orig || !pct || pct <= 0 || pct >= 100) return null
-    return Math.round(orig * (1 - pct / 100) * 100) / 100
+    if (!orig || orig <= 0) return null
+    if (priceMode === 'pct') {
+      const pct = Number(pctInput)
+      if (!pct || pct <= 0 || pct >= 100) return null
+      return Math.round(orig * (1 - pct / 100) * 100) / 100
+    }
+    const amt = Number(dhInput)
+    if (!amt || amt <= 0 || amt >= orig) return null
+    return Math.round((orig - amt) * 100) / 100
   })()
 
   const handleMainFile = async (e) => {
@@ -103,17 +127,18 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
     setError('')
     if (!form.image) { setError('Please upload a main image'); return }
 
-    const finalPrice = priceMode === 'pct'
-      ? (computedSalePrice ?? null)
-      : (form.price === '' || form.price == null ? null : Number(form.price))
+    const base = form.originalPrice === '' || form.originalPrice == null ? null : Number(form.originalPrice)
+    if (base == null || base <= 0) { setError('Please enter the price'); return }
+
+    // With a valid discount, sell price = computed sale and the base shows struck-through.
+    // Without one, there's no discount: sell price = base and nothing is struck-through.
+    const hasDiscount = computedSalePrice != null && computedSalePrice < base
 
     try {
       await onSubmit({
         ...form,
-        price: finalPrice ?? 0,
-        originalPrice: form.originalPrice === '' || form.originalPrice == null
-          ? null
-          : Number(form.originalPrice),
+        price: hasDiscount ? computedSalePrice : base,
+        originalPrice: hasDiscount ? base : null,
         rating: Number(form.rating) || 0,
         reviews: Number(form.reviews) || 0,
       })
@@ -225,9 +250,9 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
             <SectionTitle>Pricing</SectionTitle>
 
             <div className="flex gap-4 items-end">
-              {/* Original price */}
+              {/* Actual price (the base price; struck-through when discounted) */}
               <div className="flex-1">
-                <label className={lbl}>Original price (DH)</label>
+                <label className={lbl}>Actual price (DH)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -239,10 +264,10 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                 />
               </div>
 
-              {/* Sale price */}
+              {/* Discount — percent off or fixed DH amount off */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className={lbl} style={{ marginBottom: 0 }}>{priceMode === 'dh' ? 'Sale price' : 'Discount'}</label>
+                  <label className={lbl} style={{ marginBottom: 0 }}>Discount (optional)</label>
                   <div className="flex rounded-md overflow-hidden border border-gray-200 text-[10px] font-mono tracking-widest">
                     <button
                       type="button"
@@ -262,15 +287,18 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                 </div>
 
                 {priceMode === 'dh' ? (
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={form.price}
-                    onChange={(e) => update('price', e.target.value)}
-                    placeholder="160.00"
-                    className={input}
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={dhInput}
+                      onChange={(e) => setDhInput(e.target.value)}
+                      placeholder="40.00"
+                      className={input + ' pr-10'}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">DH</span>
+                  </div>
                 ) : (
                   <div className="relative">
                     <input
@@ -289,23 +317,21 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
               </div>
             </div>
 
-            {/* Computed result shown below both inputs */}
-            {priceMode === 'pct' && (
-              <div className="flex justify-end">
-                {computedSalePrice != null ? (
-                  <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest">
-                    <span className="text-gray-400">Sale price →</span>
-                    <span className="bg-black text-white px-2 py-0.5 rounded-md font-semibold">
-                      {computedSalePrice.toFixed(2)} DH
-                    </span>
+            {/* Computed sell price shown below both inputs */}
+            <div className="flex justify-end">
+              {computedSalePrice != null ? (
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest">
+                  <span className="text-gray-400">Sell price →</span>
+                  <span className="bg-black text-white px-2 py-0.5 rounded-md font-semibold">
+                    {computedSalePrice.toFixed(2)} DH
                   </span>
-                ) : (
-                  <p className="font-mono text-[9px] tracking-widest text-gray-400">
-                    Enter original price + % to compute
-                  </p>
-                )}
-              </div>
-            )}
+                </span>
+              ) : (
+                <p className="font-mono text-[9px] tracking-widest text-gray-400">
+                  No discount — sells at the actual price
+                </p>
+              )}
+            </div>
           </div>
 
           {/* ── Images ── */}
