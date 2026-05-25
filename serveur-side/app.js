@@ -5,7 +5,6 @@ import "dotenv/config";
 
 import apiRouter from "./routes/index.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
-import { UPLOADS_DIR } from "./middleware/upload.js";
 
 const app = express();
 
@@ -21,15 +20,6 @@ app.use(morgan("dev"));
 app.get("/", (_req, res) => {
   res.json({ status: "ok", service: "7titaaa-api" });
 });
-
-app.use(
-  "/uploads",
-  (_req, res, next) => {
-    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    next();
-  },
-  express.static(UPLOADS_DIR)
-);
 
 app.use("/api", apiRouter);
 

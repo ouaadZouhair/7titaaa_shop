@@ -1,29 +1,9 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import os from "os";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
+import path from "path";
+import supabase from "../config/supabase.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/**
- * NOTE: Vercel's serverless filesystem is read-only except for /tmp, which is
- * ephemeral (wiped between invocations). So disk uploads do NOT persist in
- * production — this keeps the route from crashing on cold start, but to
- * actually store images, switch to Supabase Storage (see DEPLOYMENT.md).
- */
-export const UPLOADS_DIR = process.env.VERCEL
-  ? path.join(os.tmpdir(), "uploads")
-  : path.join(__dirname, "..", "uploads");
-
-try {
-  if (!fs.existsSync(UPLOADS_DIR)) {
-    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-  }
-} catch {
-  // Read-only FS — ignore; uploads simply won't persist here.
-}
+const BUCKET = process.env.SUPABASE_BUCKET || "products";
 
 const ALLOWED_MIME = new Set([
   "image/jpeg",
@@ -33,20 +13,34 @@ const ALLOWED_MIME = new Set([
   "image/avif",
 ]);
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
-    const id = crypto.randomBytes(8).toString("hex");
-    cb(null, `${Date.now()}-${id}${ext}`);
+// Keep file in memory — Vercel filesystem is ephemeral, Supabase is the real store.
+export const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME.has(file.mimetype)) return cb(null, true);
+    cb(new Error("Only image files are allowed (jpg, png, webp, gif, avif)"));
   },
 });
 
-export const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    if (ALLOWED_MIME.has(file.mimetype)) cb(null, true);
-    else cb(new Error("Only image files are allowed (jpg, png, webp, gif, avif)"));
-  },
-});
+/**
+ * Upload a file buffer to Supabase Storage and return its public URL.
+ * @param {Express.Multer.File} file  — req.file from multer
+ * @returns {Promise<string>}          public URL
+ */
+export async function uploadToSupabase(file) {
+  const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+  const filename = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(filename, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false,
+    });
+
+  if (error) throw new Error(`Supabase upload failed: ${error.message}`);
+
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+}
