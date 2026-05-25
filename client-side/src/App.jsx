@@ -15,6 +15,7 @@ const Contact        = lazy(() => import('./pages/Contact'))
 const Checkout       = lazy(() => import('./pages/Checkout'))
 const Login          = lazy(() => import('./pages/Login'))
 const Register       = lazy(() => import('./pages/Register'))
+const ComingSoon     = lazy(() => import('./pages/ComingSoon'))
 
 /* Admin pages — only loaded when /admin is visited */
 const Overview       = lazy(() => import('./pages/admin/Overview'))
@@ -62,8 +63,11 @@ export default function App() {
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageFallback />}>
         <Routes location={location} key={location.pathname}>
+          {/* Standalone full-screen page — no navbar/footer */}
+          <Route index element={<ComingSoon />} />
+
           <Route element={<MainLayout />}>
-            <Route index element={<Home />} />
+            {/* <Route index element={<Home />} /> */}
             <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/contact" element={<Contact />} />
