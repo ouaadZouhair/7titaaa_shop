@@ -10,16 +10,20 @@ import { UPLOADS_DIR } from "./middleware/upload.js";
 const app = express();
 
 // Comma-separated list lets you allow prod + preview/localhost origins at once.
+// Example: CLIENT_ORIGIN=https://7titaaa.vercel.app,http://localhost:5173
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
+
+console.log("[CORS] Allowed origins:", allowedOrigins);
 
 app.use(
   cors({
     origin(origin, callback) {
       // Allow non-browser clients (curl, server-to-server) with no Origin header.
       if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       return callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
     credentials: true,
