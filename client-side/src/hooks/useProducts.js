@@ -9,7 +9,9 @@ export function useProducts(params = {}) {
     let cancelled = false
     api.get('/products', { params: JSON.parse(key) }).then(
       ({ data }) => {
-        if (!cancelled) setState({ items: data.items, total: data.total, loading: false, error: null })
+        // Guard against an unexpected response shape (e.g. HTML from a bad API URL)
+        const items = Array.isArray(data?.items) ? data.items : []
+        if (!cancelled) setState({ items, total: data?.total ?? 0, loading: false, error: null })
       },
       (err) => {
         if (!cancelled) setState((s) => ({ ...s, loading: false, error: err }))
