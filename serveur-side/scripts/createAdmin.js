@@ -19,7 +19,7 @@ const [, , argName, argEmail, argPassword] = process.argv;
 
 const name = argName || process.env.ADMIN_NAME || "Admin";
 const email = argEmail || process.env.ADMIN_EMAIL;
-const password = 123456789 || process.env.ADMIN_PASSWORD;
+const password = argPassword || process.env.ADMIN_PASSWORD;
 
 const run = async () => {
   if (!email || !password) {
