@@ -64,7 +64,32 @@ export default function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes location={location} key={location.pathname}>
           {/* Standalone full-screen page — no navbar/footer */}
-          <Route index element={<ComingSoon />} />
+          {/* <Route index element={<ComingSoon />} /> */}
+
+          <Route element={<MainLayout />}>
+            <Route index element={<ComingSoon />} />
+            <Route path="/shop" element={<ComingSoon />} />
+            <Route path="/product/:id" element={<ComingSoon />} />
+              <Route path="/contact" element={<ComingSoon />} />
+            <Route path="/checkout" element={<ComingSoon />} />
+            <Route path="/login" element={<ComingSoon />} />
+            <Route path="/register" element={<ComingSoon />} />
+          </Route>
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ComingSoon />} />
+            <Route path="products" element={<ComingSoon />} />
+            <Route path="orders" element={<ComingSoon />} />
+            <Route path="messages" element={<ComingSoon />} />
+            <Route path="settings" element={<ComingSoon />} />
+          </Route>
 
           {/* <Route element={<MainLayout />}>
             <Route index element={<Home />} />
