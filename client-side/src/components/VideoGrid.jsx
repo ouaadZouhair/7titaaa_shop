@@ -79,8 +79,8 @@ export default function VideoGrid() {
 
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-2 max-w-md mx-auto lg:mx-0">
-      {/* Thumbnails — row below the video on mobile, column to the left on desktop */}
-      <div className="flex flex-row lg:flex-col gap-1.5 flex-wrap justify-center lg:justify-start">
+      {/* Thumbnails — hidden on mobile, column to the left on desktop */}
+      <div className="hidden lg:flex flex-col gap-1.5">
         {videos.map((v, i) => (
           <Thumbnail key={i} src={v} active={i === current} onClick={() => go(i)} />
         ))}
