@@ -31,7 +31,7 @@ function PageFallback() {
         {[0, 1, 2].map(i => (
           <span
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-primary"
+            className="w-1.5 h-1.5 rounded-full bg-white"
             style={{
               animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
               opacity: 0.6,
@@ -56,21 +56,21 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  if (loading) return <Loader />
+  // if (loading) return <Loader />
 
   return (
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageFallback />}>
         <Routes location={location} key={location.pathname}>
           {/* Standalone full-screen page — no navbar/footer */}
-          {/* <Route index element={<ComingSoon />} /> */}
+          <Route index element={<ComingSoon />} />
 
           <Route element={<MainLayout />}>
-            <Route index element={<Home />} />
+            {/* <Route index element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout" element={<Checkout />} /> */}
             <Route path="/login" element={<Login />} />
           </Route>
 
