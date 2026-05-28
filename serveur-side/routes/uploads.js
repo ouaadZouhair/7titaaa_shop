@@ -4,11 +4,22 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
+// Wrap multer so size/type errors return clean JSON instead of a generic 500.
+const uploadSingle = (req, res, next) => {
+  upload.single("file")(req, res, (err) => {
+    if (!err) return next();
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ message: "Image must be 300 KB or smaller" });
+    }
+    return res.status(400).json({ message: err.message || "Upload failed" });
+  });
+};
+
 router.post(
   "/",
   requireAuth,
   requireRole("admin"),
-  upload.single("file"),
+  uploadSingle,
   async (req, res, next) => {
     try {
       if (!req.file) {

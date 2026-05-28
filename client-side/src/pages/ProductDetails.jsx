@@ -18,7 +18,7 @@ export default function ProductDetails() {
   const { product, loading } = useProduct(id)
   const { items: relatedAll } = useProducts({
     category: product?.category,
-    limit: 8,
+    limit: 12,
   })
 
   const [activeImg, setActiveImg] = useState(0)
@@ -50,7 +50,9 @@ export default function ProductDetails() {
     )
   }
 
-  const related = relatedAll.filter(p => p.id !== product.id).slice(0, 4)
+  const related = relatedAll
+    .filter(p => p.id !== product.id && p.isAvailable !== false)
+    .slice(0, 4)
   const isAvailable = product.isAvailable !== false
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -134,23 +136,20 @@ export default function ProductDetails() {
 
             {/* Badges */}
             <div className="absolute top-4 left-4 flex flex-col items-start gap-1.5">
-              {!isAvailable ? (
+              {!isAvailable && (
                 <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
                   {t('product.soldOut')}
                 </span>
-              ) : (
-                <>
-                  {product.quality != null && (
-                    <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
-                      {t(`product.qualityTiers.${product.quality}`)}
-                    </span>
-                  )}
-                  {discount && (
-                    <span className="bg-red-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
-                      -{discount}%
-                    </span>
-                  )}
-                </>
+              )}
+              {product.quality != null && (
+                <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
+                  {t(`product.qualityTiers.${product.quality}`)}
+                </span>
+              )}
+              {isAvailable && discount && (
+                <span className="bg-red-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
+                  -{discount}%
+                </span>
               )}
             </div>
           </div>

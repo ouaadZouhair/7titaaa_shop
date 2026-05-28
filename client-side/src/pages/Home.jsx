@@ -35,7 +35,8 @@ function Section({ children, className = '' }) {
 }
 
 export default function Home() {
-  const { items: newDrops, loading } = useProducts({ limit: 8 })
+  const { items: allDrops, loading } = useProducts({ limit: 12 })
+  const newDrops = allDrops.filter(p => p.isAvailable !== false).slice(0, 8)
   const { t } = useTranslation()
 
   return (
@@ -153,7 +154,7 @@ export default function Home() {
           </Link>
         </Section>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {loading
             ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
             : newDrops.map((product, i) => (

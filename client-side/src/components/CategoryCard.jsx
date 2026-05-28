@@ -31,14 +31,8 @@ export default function CategoryCard({ category, className = '' }) {
 
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-5">
-        <motion.p
-          initial={{ y: 10, opacity: 0.7 }}
-          whileHover={{ y: 0, opacity: 1 }}
-          className="font-mono text-[10px] text-primary-light tracking-widest uppercase mb-1"
-        >
-          {t('category.items', { count: category.count })}
-        </motion.p>
-        <h3 className="font-display text-2xl text-white tracking-wider uppercase">
+  
+        <h3 className="font-display text-2xl md:text-5xl text-white tracking-wider uppercase">
           {category.name}
         </h3>
         <motion.div

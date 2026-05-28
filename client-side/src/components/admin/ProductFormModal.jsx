@@ -84,7 +84,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
       const url = await uploadImage(file)
       update('image', url)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to upload image')
+      setError(err.response?.data?.message || err.message || 'Failed to upload image')
     } finally {
       setMainUploading(false)
       if (mainFileRef.current) mainFileRef.current.value = ''
@@ -104,7 +104,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
       }
       update('images', [...(form.images || []), ...uploaded])
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to upload image')
+      setError(err.response?.data?.message || err.message || 'Failed to upload image')
     } finally {
       setExtraUploading(false)
       if (extraFileRef.current) extraFileRef.current.value = ''

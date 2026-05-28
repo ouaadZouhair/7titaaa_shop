@@ -55,23 +55,20 @@ export default function ProductCard({ product }) {
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
-            {!isAvailable ? (
+            {!isAvailable && (
               <span className="bg-gray-700 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
                 {t('product.soldOut')}
               </span>
-            ) : (
-              <>
-                {product.quality != null && (
-                  <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
-                    {t(`product.qualityTiers.${product.quality}`)}
-                  </span>
-                )}
-                {discount && (
-                  <span className="bg-red-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
-                    -{discount}%
-                  </span>
-                )}
-              </>
+            )}
+            {product.quality != null && (
+              <span className={`${qualityBadgeColor(product.quality)} text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase`}>
+                {t(`product.qualityTiers.${product.quality}`)}
+              </span>
+            )}
+            {isAvailable && discount && (
+              <span className="bg-red-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
+                -{discount}%
+              </span>
             )}
           </div>
 
@@ -118,9 +115,16 @@ export default function ProductCard({ product }) {
 
         {/* ── Info ── */}
         <div className="px-3 pt-3 pb-4 flex items-start justify-between gap-3">
-          <h3 className="font-mono text-xs tracking-[0.2em] uppercase text-neutral-900 leading-snug line-clamp-2 flex-1 font-bold">
-            {product.name}
-          </h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-mono text-xs tracking-[0.2em] uppercase text-neutral-900 leading-snug line-clamp-2 font-bold">
+              {product.name}
+            </h3>
+            {product.size && (
+              <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-neutral-500 mt-1">
+                {t('product.size')}: {product.size}
+              </p>
+            )}
+          </div>
           <div className="flex flex-col items-end shrink-0">
             <span className="font-bold text-[13px] text-neutral-900 leading-tight">
               {product.price} DH

@@ -16,7 +16,7 @@ const ALLOWED_MIME = new Set([
 // Keep file in memory — Vercel filesystem is ephemeral, Supabase is the real store.
 export const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  limits: { fileSize: 300 * 1024 }, // 300 KB
   fileFilter: (_req, file, cb) => {
     if (ALLOWED_MIME.has(file.mimetype)) return cb(null, true);
     cb(new Error("Only image files are allowed (jpg, png, webp, gif, avif)"));
