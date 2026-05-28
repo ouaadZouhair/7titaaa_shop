@@ -1,10 +1,10 @@
-// Quality tier → badge color. Higher tier = more premium color.
+// Quality tier → badge color. Condition scale: red → orange → gold → green → premium blue.
 export const QUALITY_BADGE_COLOR = {
-  5: 'bg-cyan-300 text-cyan-900 ring-1 ring-cyan-200',
-  4: 'bg-slate-400 text-white',
-  3: 'bg-amber-400 text-black',
-  2: 'bg-zinc-300 text-zinc-800',
-  1: 'bg-amber-700 text-amber-50',
+  1: 'bg-[#E53935] text-white', // Mauvais état
+  2: 'bg-[#FB8C00] text-white', // État correct
+  3: 'bg-[#FBC02D] text-black', // Bon état
+  4: 'bg-[#43A047] text-white', // Très bon état
+  5: 'bg-[#1E88E5] text-white', // Comme neuf / Premium
 }
 
 export const qualityBadgeColor = (quality) =>

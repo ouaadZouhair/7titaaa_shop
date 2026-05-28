@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -114,12 +114,6 @@ export default function Login() {
             </AnimatedButton>
           </div>
 
-          <p className="text-center text-sm text-gray-500 pt-4">
-            {t('login.noAccount')}{' '}
-            <Link to="/register" className="text-street-black font-semibold hover:text-primary transition-colors">
-              {t('login.signUp')}
-            </Link>
-          </p>
         </motion.form>
       </div>
     </div>

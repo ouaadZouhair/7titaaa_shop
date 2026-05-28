@@ -51,11 +51,11 @@
     "description": "Description",
     "quality": "Qualité",
     "qualityTiers": {
-      "1": "Bronze",
-      "2": "Argent",
-      "3": "Or",
-      "4": "Platine",
-      "5": "Diamant"
+      "1": "Mauvais",
+      "2": "Correct",
+      "3": "Bon",
+      "4": "Très bon",
+      "5": "Comme neuf"
     },
     "size": "Taille",
     "type": "Type",

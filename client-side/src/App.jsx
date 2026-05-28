@@ -14,7 +14,6 @@ const ProductDetails = lazy(() => import('./pages/ProductDetails'))
 const Contact        = lazy(() => import('./pages/Contact'))
 const Checkout       = lazy(() => import('./pages/Checkout'))
 const Login          = lazy(() => import('./pages/Login'))
-const Register       = lazy(() => import('./pages/Register'))
 const ComingSoon     = lazy(() => import('./pages/ComingSoon'))
 
 /* Admin pages — only loaded when /admin is visited */
@@ -64,41 +63,15 @@ export default function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes location={location} key={location.pathname}>
           {/* Standalone full-screen page — no navbar/footer */}
-          {/* <Route index element={<ComingSoon />} /> */}
+          <Route index element={<ComingSoon />} />
 
           <Route element={<MainLayout />}>
-            <Route index element={<ComingSoon />} />
-            <Route path="/shop" element={<ComingSoon />} />
-            <Route path="/product/:id" element={<ComingSoon />} />
-              <Route path="/contact" element={<ComingSoon />} />
-            <Route path="/checkout" element={<ComingSoon />} />
-            <Route path="/login" element={<ComingSoon />} />
-            <Route path="/register" element={<ComingSoon />} />
-          </Route>
-
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin">
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<ComingSoon />} />
-            <Route path="products" element={<ComingSoon />} />
-            <Route path="orders" element={<ComingSoon />} />
-            <Route path="messages" element={<ComingSoon />} />
-            <Route path="settings" element={<ComingSoon />} />
-          </Route>
-
-          {/* <Route element={<MainLayout />}>
-            <Route index element={<Home />} />
+            {/* <Route index element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/contact" element={<Contact />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/checkout" element={<Checkout />} /> */}
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
           </Route>
 
           <Route
@@ -114,7 +87,7 @@ export default function App() {
             <Route path="orders" element={<AdminOrders />} />
             <Route path="messages" element={<AdminMessages />} />
             <Route path="settings" element={<Settings />} />
-          </Route> */}
+          </Route>
         </Routes>
       </Suspense>
     </AnimatePresence>

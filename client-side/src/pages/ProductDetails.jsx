@@ -146,7 +146,7 @@ export default function ProductDetails() {
                     </span>
                   )}
                   {discount && (
-                    <span className="bg-green-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
+                    <span className="bg-red-600 text-white text-[10px] font-mono font-bold px-2.5 py-1 tracking-[0.2em] uppercase">
                       -{discount}%
                     </span>
                   )}
