@@ -68,7 +68,7 @@ export default function App() {
           <Route element={<MainLayout />}>
             <Route index element={<ComingSoon />} />
             <Route path="/shop" element={<ComingSoon />} />
-            <Route path="/product/:id" element={<ProComingSoonductDetails />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/contact" element={<ComingSoon />} />
             <Route path="/checkout" element={<ComingSoon />} />
             <Route path="/login" element={<Login />} />
