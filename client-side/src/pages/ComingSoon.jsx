@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import logo from '../assets/7titaaa_logo2.svg'
-import avatar from '../assets/profiel/ZouhairOD_profiel.png'
+import avatar from '../assets/profiel/ZouhairOD_profiel.webp'
 
 /* Launch target — change this to your real drop date. */
 const LAUNCH_DATE = new Date('2026-06-01T00:00:00')

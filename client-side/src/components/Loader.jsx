@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import logo from '../assets/7titaaa_logo2.svg'
-import avatar from '../assets/profiel/ZouhairOD_profiel.png'
+import avatar from '../assets/profiel/ZouhairOD_profiel.webp'
 
 export default function Loader() {
   return (
