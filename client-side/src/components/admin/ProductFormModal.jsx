@@ -202,7 +202,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
                 className={input}
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className={lbl}>Category</label>
                 <select
@@ -249,7 +249,7 @@ function ProductForm({ initial, onClose, onSubmit, submitting }) {
           <div className="space-y-3">
             <SectionTitle>Pricing</SectionTitle>
 
-            <div className="flex gap-4 items-end">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
               {/* Actual price (the base price; struck-through when discounted) */}
               <div className="flex-1">
                 <label className={lbl}>Actual price (DH)</label>
