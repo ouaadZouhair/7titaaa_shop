@@ -48,7 +48,7 @@ export default function App() {
   const location = useLocation()
 
   useEffect(() => {           
-    const t = setTimeout(() => setLoading(false), 3000)
+    const t = setTimeout(() => setLoading(false), 5000)
     return () => clearTimeout(t)
   }, [])
 
@@ -56,7 +56,7 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  // if (loading) return <Loader />
+  if (loading) return <Loader />
 
   return (
     <AnimatePresence mode="wait">

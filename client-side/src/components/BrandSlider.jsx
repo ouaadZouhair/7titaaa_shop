@@ -1,11 +1,5 @@
-/*
- * BrandSlider — uses import.meta.glob instead of 20 individual static imports.
- * This keeps them out of the main JS chunk and lets Vite hash + cache each
- * PNG as a separate asset.  All logos get loading="lazy" + decoding="async"
- * because they are below-the-fold on first paint.
- */
 const logoModules = import.meta.glob(
-  '../assets/brand/*.png',
+  '../assets/brands/*.png',
   { eager: true, query: '?url', import: 'default' }
 )
 const brandLogos = Object.values(logoModules)

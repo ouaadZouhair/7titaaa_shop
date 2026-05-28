@@ -41,10 +41,10 @@ function buildKeyframes(n, direction) {
   return kf
 }
 
-function ScrollStrip({ images, direction }) {
+function ScrollStrip({ images, direction, id }) {
   const n     = images.length
   const total = n * (PAUSE + SLIDE)
-  const name  = `heroStrip_${direction}`
+  const name  = `heroStrip_${id}`
 
   /*
    * Performance notes:
@@ -91,26 +91,31 @@ export default function HeroSection() {
   return (
     <section className="relative h-screen min-h-150 overflow-hidden">
 
-      {/* ── Split panels ── */}
-      <div className="absolute inset-0 flex flex-col md:flex-row">
+      {/* ── Mobile: single full-screen vertical slider with all images ── */}
+      <div className="md:hidden absolute inset-0 overflow-hidden">
+        <ScrollStrip images={allImages} direction="up" id="mobile" />
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
+
+      {/* ── Desktop: split panels ── */}
+      <div className="hidden md:flex absolute inset-0 flex-row">
 
         {/* LEFT — scrolls up */}
-        <div className="h-1/2 md:h-full md:w-1/2 relative overflow-hidden">
-          <ScrollStrip images={leftImages} direction="up" />
+        <div className="h-full w-1/2 relative overflow-hidden">
+          <ScrollStrip images={leftImages} direction="up" id="left" />
           <div className="absolute inset-0 bg-black/20" />
         </div>
 
         {/* RIGHT — scrolls down */}
-        <div className="h-1/2 md:h-full md:w-1/2 relative overflow-hidden">
-          <ScrollStrip images={rightImages} direction="down" />
+        <div className="h-full w-1/2 relative overflow-hidden">
+          <ScrollStrip images={rightImages} direction="down" id="right" />
           <div className="absolute inset-0 bg-black/20" />
         </div>
 
       </div>
 
-      {/* ── Divider ── */}
+      {/* ── Divider (desktop only) ── */}
       <div className="hidden md:block absolute inset-y-0 left-1/2 w-px bg-white/25 z-10" />
-      <div className="md:hidden absolute top-1/2 inset-x-0 h-px bg-white/25 z-10" />
 
       {/* ── Centered overlay ── */}
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6 gap-2">
