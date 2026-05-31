@@ -87,11 +87,10 @@
     "categories": {
       "All": "Tout",
       "Hoodies": "Hoodies",
-      "Sneakers": "Sneakers",
+      "Jeans": "Jeans",
       "Caps": "Casquettes",
-      "Tees": "T-shirts",
-      "Jackets": "Vestes",
-      "Bottoms": "Bas"
+      "Tshirts": "T-shirts",
+      "Jackets": "Vestes"
     }
   },
   "checkout": {
@@ -143,8 +142,8 @@
       "hours": "Horaires",
       "location": "Adresse"
     },
-    "hoursValue": "Lun–Ven, 9h–18h",
-    "locationValue": "Rabat — Maroc",
+    "hoursValue": "Lun–Dim, 9h–21h",
+    "locationValue": "36 Centre Commercial La Perle de La Médina Océan Rabat",
     "followDrop": "SUIS LE DROP",
     "firstName": "Prénom",
     "lastName": "Nom",

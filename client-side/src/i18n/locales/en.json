@@ -87,11 +87,10 @@
     "categories": {
       "All": "All",
       "Hoodies": "Hoodies",
-      "Sneakers": "Sneakers",
+      "Jeans": "Jeans",
       "Caps": "Caps",
-      "Tees": "Tees",
-      "Jackets": "Jackets",
-      "Bottoms": "Bottoms"
+      "Tshirts": "T-shirts",
+      "Jackets": "Jackets"
     }
   },
   "checkout": {
@@ -143,8 +142,8 @@
       "hours": "Hours",
       "location": "Location"
     },
-    "hoursValue": "Mon–Fri, 9AM–6PM",
-    "locationValue": "Rabat — Morocco",
+    "hoursValue": "Mon–Sun, 9AM–9PM",
+    "locationValue": "36 La Perle de La Médina Shopping Center, Rabat Ocean",
     "followDrop": "FOLLOW THE DROP",
     "firstName": "First Name",
     "lastName": "Last Name",

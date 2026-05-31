@@ -3,11 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { useProducts } from '../hooks/useProducts'
+import { categories } from '../data/products'
 import vintageStore from '../assets/photos/clothes.jpg'
 import ProductCard from '../components/ProductCard'
 import SkeletonCard from '../components/SkeletonCard'
 
-const ALL_CATEGORIES = ['All', 'Hoodies', 'Sneakers', 'Caps', 'Tees', 'Jackets', 'Bottoms']
+const ALL_CATEGORIES = ['All', ...categories.map(c => c.name)]
 const SORT_OPTIONS = [
   { value: 'newest', labelKey: 'shop.sort.newest' },
   { value: 'price-asc', labelKey: 'shop.sort.priceAsc' },
