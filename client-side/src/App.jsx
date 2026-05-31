@@ -63,14 +63,14 @@ export default function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes location={location} key={location.pathname}>
           {/* Standalone full-screen page — no navbar/footer */}
-          <Route index element={<ComingSoon />} />
+          {/* <Route index element={<ComingSoon />} /> */}
 
           <Route element={<MainLayout />}>
-            {/* <Route index element={<ComingSoon />} /> */}
-            <Route path="/shop" element={<ComingSoon />} />
+            <Route index element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/contact" element={<ComingSoon />} />
-            <Route path="/checkout" element={<ComingSoon />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
           </Route>
 
