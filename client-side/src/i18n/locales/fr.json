@@ -11,7 +11,11 @@
     "viewAll": "Voir tout",
     "loading": "Chargement…",
     "search": "Rechercher produits, tags...",
-    "clear": "Effacer"
+    "searchTab": "Recherche",
+    "categories": "Catégories",
+    "tags": "Tags",
+    "clear": "Effacer",
+    "close": "Fermer"
   },
   "hero": {
     "cta": "Acheter"

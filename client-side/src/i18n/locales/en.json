@@ -11,7 +11,11 @@
     "viewAll": "View All",
     "loading": "Loading…",
     "search": "Search products, tags...",
-    "clear": "Clear"
+    "searchTab": "Search",
+    "categories": "Categories",
+    "tags": "Tags",
+    "clear": "Clear",
+    "close": "Close"
   },
   "hero": {
     "cta": "Shop Now"
