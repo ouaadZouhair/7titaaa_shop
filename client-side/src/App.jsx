@@ -56,7 +56,7 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  // if (loading) return <Loader />
+  if (loading) return <Loader />
 
   return (
     <AnimatePresence mode="wait">
