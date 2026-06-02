@@ -26,6 +26,7 @@ export default function ProductDetails() {
   const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 })
   // Mobile-only double-tap zoom toggle (desktop uses hover zoom above)
   const [touchZoom, setTouchZoom] = useState({ active: false, x: 50, y: 50 })
+  const [isTouch, setIsTouch] = useState(false)
   const lastTapRef = useRef(0)
   const isTouchRef = useRef(false)
 
@@ -44,6 +45,7 @@ export default function ProductDetails() {
   // a second double-tap zooms back out.
   const handleTouchStart = () => {
     isTouchRef.current = true
+    setIsTouch(true)
     setZoom({ active: false, x: 50, y: 50 })
   }
   const handleTouchEnd = (e) => {
@@ -168,7 +170,7 @@ export default function ProductDetails() {
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16zm-3-8h6m-3-3v6" />
               </svg>
-              {t('product.hoverToZoom')}
+              {isTouch ? t('product.tapToZoom') : t('product.hoverToZoom')}
             </div>
 
             {/* Badges */}
