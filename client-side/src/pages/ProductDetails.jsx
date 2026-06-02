@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +24,9 @@ export default function ProductDetails() {
   const [activeImg, setActiveImg] = useState(0)
   const [added, setAdded] = useState(false)
   const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 })
+  // Mobile-only double-tap zoom toggle (desktop uses hover zoom above)
+  const [touchZoom, setTouchZoom] = useState({ active: false, x: 50, y: 50 })
+  const lastTapRef = useRef(0)
 
   const handleZoomMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -32,6 +35,28 @@ export default function ProductDetails() {
     setZoom({ active: true, x, y })
   }
   const handleZoomLeave = () => setZoom((z) => ({ ...z, active: false }))
+
+  // Double-tap on touch devices: first tap-tap zooms in at the tap point,
+  // a second double-tap zooms back out.
+  const handleTouchEnd = (e) => {
+    const now = Date.now()
+    if (now - lastTapRef.current < 300) {
+      e.preventDefault()
+      const touch = e.changedTouches[0]
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((touch.clientX - rect.left) / rect.width) * 100
+      const y = ((touch.clientY - rect.top) / rect.height) * 100
+      setTouchZoom((z) => (z.active ? { active: false, x: 50, y: 50 } : { active: true, x, y }))
+      lastTapRef.current = 0
+    } else {
+      lastTapRef.current = now
+    }
+  }
+
+  const selectImage = (i) => {
+    setActiveImg(i)
+    setTouchZoom({ active: false, x: 50, y: 50 })
+  }
 
   if (loading) {
     return (
@@ -89,7 +114,7 @@ export default function ProductDetails() {
                 key={i}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => setActiveImg(i)}
+                onClick={() => selectImage(i)}
                 className={`shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-sm overflow-hidden border-2 transition-colors ${
                   activeImg === i ? 'border-primary' : 'border-transparent'
                 }`}
@@ -104,6 +129,7 @@ export default function ProductDetails() {
             className="flex-1 relative rounded-sm overflow-hidden aspect-4/5 bg-gray-100 cursor-zoom-in"
             onMouseMove={handleZoomMove}
             onMouseLeave={handleZoomLeave}
+            onTouchEnd={handleTouchEnd}
           >
             <AnimatePresence mode="wait">
               <motion.img
@@ -112,8 +138,10 @@ export default function ProductDetails() {
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-200 ease-out will-change-transform pointer-events-none"
                 style={{
-                  transformOrigin: `${zoom.x}% ${zoom.y}%`,
-                  transform: zoom.active ? 'scale(2.4)' : 'scale(1)',
+                  transformOrigin: touchZoom.active
+                    ? `${touchZoom.x}% ${touchZoom.y}%`
+                    : `${zoom.x}% ${zoom.y}%`,
+                  transform: zoom.active || touchZoom.active ? 'scale(2.4)' : 'scale(1)',
                 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -125,7 +153,7 @@ export default function ProductDetails() {
             {/* Zoom hint */}
             <div
               className={`absolute bottom-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white font-mono text-[9px] tracking-widest uppercase pointer-events-none transition-opacity duration-200 ${
-                zoom.active ? 'opacity-0' : 'opacity-100'
+                zoom.active || touchZoom.active ? 'opacity-0' : 'opacity-100'
               }`}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
