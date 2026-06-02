@@ -27,8 +27,12 @@ export default function ProductDetails() {
   // Mobile-only double-tap zoom toggle (desktop uses hover zoom above)
   const [touchZoom, setTouchZoom] = useState({ active: false, x: 50, y: 50 })
   const lastTapRef = useRef(0)
+  const isTouchRef = useRef(false)
 
   const handleZoomMove = (e) => {
+    // Ignore the synthetic mouse events a tap fires on touch devices,
+    // otherwise hover zoom would stay stuck on and never zoom out.
+    if (isTouchRef.current) return
     const rect = e.currentTarget.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
@@ -38,6 +42,10 @@ export default function ProductDetails() {
 
   // Double-tap on touch devices: first tap-tap zooms in at the tap point,
   // a second double-tap zooms back out.
+  const handleTouchStart = () => {
+    isTouchRef.current = true
+    setZoom({ active: false, x: 50, y: 50 })
+  }
   const handleTouchEnd = (e) => {
     const now = Date.now()
     if (now - lastTapRef.current < 300) {
@@ -129,6 +137,7 @@ export default function ProductDetails() {
             className="flex-1 relative rounded-sm overflow-hidden aspect-4/5 bg-gray-100 cursor-zoom-in"
             onMouseMove={handleZoomMove}
             onMouseLeave={handleZoomLeave}
+            onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             <AnimatePresence mode="wait">
